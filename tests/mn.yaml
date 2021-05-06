@@ -1,11 +1,11 @@
 apiVersion: elastic.pytorch.org/v1alpha1
 kind: ElasticJob
 metadata:
-  name: debugging
+  name: test
   namespace: elastic-job
 spec:
   # Use "etcd-service:2379" if you already apply etcd.yaml
-  rdzvEndpoint: etcd://10.100.232.130:2379/debugging?min_workers=2&max_workers=2
+  rdzvEndpoint: etcd://10.100.232.130:2379/test?min_workers=2&max_workers=2
   minReplicas: 2
   maxReplicas: 2
   replicaSpecs:
@@ -17,7 +17,7 @@ spec:
         kind: Pod
         spec:
           containers:
-            - name: debugging
+            - name: test
               image: pytorchlightning/pytorch_lightning:base-cuda-py3.7-torch1.8
               imagePullPolicy: Always
               command:
@@ -33,7 +33,7 @@ spec:
                 pip install -e .
                 pip install torchelastic
                 export PL_RUNNING_SPECIAL_TESTS=1
-                DEFAULTS_ELASTIC=" -m torchelastic.distributed.launch --nnodes=2 --nproc_per_node=1 --rdzv_id=debugging --rdzv_backend=etcd --rdzv_endpoint=10.100.232.130:2379"
+                DEFAULTS_ELASTIC=" -m torchelastic.distributed.launch --nnodes=2 --nproc_per_node=1 --rdzv_id=test --rdzv_backend=etcd --rdzv_endpoint=10.100.232.130:2379"
                 DEFAULTS_FIRST=" -m coverage run --source pytorch_lightning -m pytest --verbose --capture=no"
                 DEFAULTS_AFTER=" -m coverage run --source pytorch_lightning -a -m pytest --verbose --capture=no"
                 # special tests list

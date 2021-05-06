@@ -37,7 +37,10 @@ spec:
                 DEFAULTS_FIRST=" -m coverage run --source pytorch_lightning -m pytest --verbose --capture=no"
                 DEFAULTS_AFTER=" -m coverage run --source pytorch_lightning -a -m pytest --verbose --capture=no"
                 # special tests list
-                %(LIST_TESTS)s
+
+                python $DEFAULTS_ELASTIC $DEFAULTS_FIRST ./tests/backends/test_multi_nodes_gpu.py::test_logging_sync_dist_true_ddp
+                python $DEFAULTS_ELASTIC $DEFAULTS_AFTER ./tests/backends/test_multi_nodes_gpu.py::test_logging_sync_dist_true_ddp
+
                 coverage report
                 # special tests list
                 echo "END_TOKEN"

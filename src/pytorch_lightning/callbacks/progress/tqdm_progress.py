@@ -387,4 +387,4 @@ def _update_n(bar: _tqdm, current: int, refresh_rate: int) -> None:
         leftover = current % refresh_rate
         advance = leftover if (current == total and leftover != 0) else refresh_rate
         bar.update(advance)
-        bar.refresh()
+        # bar.refresh()

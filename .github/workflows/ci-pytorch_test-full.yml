@@ -91,20 +91,27 @@ jobs:
         pip list
       shell: bash
 
-    - name: DocTests
-      working-directory: ./src
-      run: pytest pytorch_lightning --cov=pytorch_lightning
+    # - name: DocTests
+    #   working-directory: ./src
+    #   run: pytest pytorch_lightning --cov=pytorch_lightning
 
-    - name: Install extra dependencies
-      run: |
-        # adjust versions according installed Torch version
-        python ./requirements/pytorch/adjust-versions.py requirements/pytorch/extra.txt
-        pip install --requirement ./requirements/pytorch/extra.txt --find-links https://download.pytorch.org/whl/cpu/torch_stable.html --upgrade
-        pip list
-      shell: bash
+    # - name: Install extra dependencies
+    #   run: |
+    #     # adjust versions according installed Torch version
+    #     python ./requirements/pytorch/adjust-versions.py requirements/pytorch/extra.txt
+    #     pip install --requirement ./requirements/pytorch/extra.txt --find-links https://download.pytorch.org/whl/cpu/torch_stable.html --upgrade
+    #     pip list
+    #   shell: bash
 
     - name: Print versions
-      run: pip freeze >> $GITHUB_STEP_SUMMARY
+      run: |
+        echo "<details><summary>pip freeze</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        pip freeze >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "</details" >> $GITHUB_STEP_SUMMARY
       shell: bash
 
     # - name: Reinstall Horovod if necessary

@@ -103,6 +103,10 @@ jobs:
         pip list
       shell: bash
 
+    - name: Print versions
+      run: pip freeze >> $GITHUB_STEP_SUMMARY
+      shell: bash
+
     - name: Reinstall Horovod if necessary
       if: runner.os != 'windows'
       env:

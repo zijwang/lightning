@@ -19,7 +19,7 @@ def test_get_flow_state(flow_state_state: dict, flow):
 
 
 def render_fn():
-    """Do nothing"""
+    """Do nothing."""
 
 
 def test_get_render_fn_from_environment():
@@ -38,9 +38,7 @@ def some_fn(_):
 def test_get_frontend_environment_fn():
     """We have a utility function to get the frontend render_fn environment."""
     # When
-    env = get_frontend_environment(
-        flow="root.lit_frontend", render_fn_or_file=some_fn, host="myhost", port=1234
-    )
+    env = get_frontend_environment(flow="root.lit_frontend", render_fn_or_file=some_fn, host="myhost", port=1234)
     # Then
     assert env["LIGHTNING_FLOW_NAME"] == "root.lit_frontend"
     assert env["LIGHTNING_RENDER_ADDRESS"] == "myhost"
@@ -52,9 +50,7 @@ def test_get_frontend_environment_fn():
 def test_get_frontend_environment_file():
     """We have a utility function to get the frontend render_fn environment."""
     # When
-    env = get_frontend_environment(
-        flow="root.lit_frontend", render_fn_or_file="app_panel.py", host="myhost", port=1234
-    )
+    env = get_frontend_environment(flow="root.lit_frontend", render_fn_or_file="app_panel.py", host="myhost", port=1234)
     # Then
     assert env["LIGHTNING_FLOW_NAME"] == "root.lit_frontend"
     assert env["LIGHTNING_RENDER_ADDRESS"] == "myhost"

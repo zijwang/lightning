@@ -7,21 +7,24 @@ from app_state_watcher import AppStateWatcher
 
 from lightning_app.utilities.state import AppState
 
+
 def to_str(value):
     if isinstance(value, list):
         return "\n".join([str(item) for item in value])
     return str(value)
 
+
 if "LIGHTNING_FLOW_NAME" in os.environ:
     app = AppStateWatcher()
 else:
+
     class AppMock(param.Parameterized):
         state = param.Parameter()
 
     app = AppMock(state=Mock())
     import json
 
-    with open("state.json", "r") as fp:
+    with open("state.json") as fp:
         app.state._state = json.load(fp)
     app.state.requests = [
         {
@@ -41,16 +44,14 @@ else:
             },
         }
     ]
-    
+
 
 ACCENT = "#792EE5"
 LIGHTNING_SPINNER_URL = (
     "https://cdn.jsdelivr.net/gh/MarcSkovMadsen/awesome-panel-assets@master/spinners/material/"
     "bar_chart_lightning_purple.svg"
 )
-LIGHTNING_SPINNER = pn.pane.HTML(
-    f"<img src='{LIGHTNING_SPINNER_URL}' style='height:100px;width:100px;'/>"
-)
+LIGHTNING_SPINNER = pn.pane.HTML(f"<img src='{LIGHTNING_SPINNER_URL}' style='height:100px;width:100px;'/>")
 # Todo: Set JSON theme depending on template theme
 # pn.pane.JSON.param.theme.default = "dark"
 pn.pane.JSON.param.hover_preview.default = True
@@ -73,18 +74,12 @@ def create_new_page():
         name="Enter a Github Repo URL",
         value="https://github.com/Lightning-AI/lightning-quick-start.git",
     )
-    script_path_input = pn.widgets.TextInput(
-        name="Enter your script to run", value="train_script.py"
-    )
+    script_path_input = pn.widgets.TextInput(name="Enter your script to run", value="train_script.py")
 
     default_script_args = "--trainer.max_epochs=5 --trainer.limit_train_batches=4 --trainer.limit_val_batches=4 --trainer.callbacks=ModelCheckpoint --trainer.callbacks.monitor=val_acc"
-    script_args_input = pn.widgets.TextInput(
-        name="Enter your base script arguments", value=default_script_args
-    )
+    script_args_input = pn.widgets.TextInput(name="Enter your base script arguments", value=default_script_args)
     default_requirements = "torchvision, pytorch_lightning, jsonargparse[signatures]"
-    requirements_input = pn.widgets.TextInput(
-        name="Enter your requirements", value=default_requirements
-    )
+    requirements_input = pn.widgets.TextInput(name="Enter your requirements", value=default_requirements)
     ml_framework_input = pn.widgets.RadioBoxGroup(
         name="Select your ML Training Frameworks",
         options=["PyTorch Lightning", "Keras", "Tensorflow"],
@@ -136,9 +131,7 @@ def card_show_work(idx, request, state):
         return pn.pane.JSON(w, theme="light", sizing_mode="stretch_both")
 
     options = {
-        "Expand to view your configuration": pn.pane.JSON(
-            request, theme="light", hover_preview=True, depth=4
-        ),
+        "Expand to view your configuration": pn.pane.JSON(request, theme="light", hover_preview=True, depth=4),
         "Expand to view logs": pn.Column(
             pn.pane.Markdown(
                 "```bash\n" + to_str(work["vars"]["logs"]) + "\n```",
@@ -153,9 +146,7 @@ def card_show_work(idx, request, state):
     def selection_output(value):
         return pn.panel(options[value], sizing_mode="stretch_both")
 
-    return pn.Column(
-        selection_input, selection_output, sizing_mode="stretch_both", name=f"Run: {idx}"
-    )
+    return pn.Column(selection_input, selection_output, sizing_mode="stretch_both", name=f"Run: {idx}")
 
 
 @pn.depends(app.param.state)

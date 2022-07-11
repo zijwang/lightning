@@ -1,5 +1,4 @@
-"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with
-Lightning.
+"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with Lightning.
 
 These tests are for serving a render_file script or notebook.
 """
@@ -15,7 +14,7 @@ from lightning_app.frontend.panel.panel_serve_render_fn_or_file import _serve
 
 @pytest.fixture(scope="module")
 def render_file():
-    """Returns the path to a Panel app file"""
+    """Returns the path to a Panel app file."""
     path = pathlib.Path(__file__).parent / "app_panel.py"
     path = path.relative_to(pathlib.Path.cwd())
     return str(path)

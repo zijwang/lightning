@@ -1,5 +1,4 @@
-"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with
-Lightning."""
+"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with Lightning."""
 import os
 from unittest import mock
 
@@ -30,6 +29,6 @@ from lightning_app.frontend.panel.panel_serve_render_fn_or_file import _has_auto
     ),
 )
 def test_autoreload(value, expected):
-    """We can get and set autoreload via the environment variable PANEL_AUTORELOAD"""
+    """We can get and set autoreload via the environment variable PANEL_AUTORELOAD."""
     with mock.patch.dict(os.environ, {"PANEL_AUTORELOAD": value}):
         assert _has_autoreload() == expected

@@ -30,27 +30,30 @@ import logging
 import os
 
 import panel as pn
-
 from app_state_watcher import AppStateWatcher
 from other import get_render_fn_from_environment
 
 _logger = logging.getLogger(__name__)
+
 
 def _get_render_fn():
     render_fn_name = os.environ["LIGHTNING_RENDER_FUNCTION"]
     render_fn_module_file = os.environ["LIGHTNING_RENDER_MODULE_FILE"]
     return get_render_fn_from_environment(render_fn_name, render_fn_module_file)
 
+
 def _render_fn_wrapper():
     render_fn = _get_render_fn()
     app = AppStateWatcher()
     return render_fn(app)
+
 
 def _get_view_fn():
     render_fn = _get_render_fn()
     if inspect.signature(render_fn).parameters:
         return _render_fn_wrapper
     return render_fn
+
 
 def _get_websocket_origin() -> str:
     # Todo: Improve this. I don't know how to find the specific host(s).
@@ -63,8 +66,10 @@ def _get_view():
         return os.environ["LIGHTNING_RENDER_FILE"]
     return _get_view_fn()
 
-def _has_autoreload()->bool:
+
+def _has_autoreload() -> bool:
     return os.environ.get("PANEL_AUTORELOAD", "no").lower() in ["yes", "true"]
+
 
 def _serve():
     port = int(os.environ["LIGHTNING_RENDER_PORT"])
@@ -78,7 +83,9 @@ def _serve():
 
     view = _get_view()
 
-    pn.serve({url: view}, address=address, port=port, websocket_origin=websocket_origin, show=False, autoreload=autoreload)
+    pn.serve(
+        {url: view}, address=address, port=port, websocket_origin=websocket_origin, show=False, autoreload=autoreload
+    )
     _logger.debug("Panel server started on port http://%s:%s/%s", address, port, url)
 
 

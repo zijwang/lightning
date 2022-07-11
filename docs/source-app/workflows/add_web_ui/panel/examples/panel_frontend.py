@@ -8,8 +8,9 @@ import subprocess
 import sys
 from typing import Callable
 
-from lightning_app.frontend.frontend import Frontend
 from other import get_frontend_environment
+
+from lightning_app.frontend.frontend import Frontend
 from lightning_app.utilities.imports import requires
 from lightning_app.utilities.log import get_frontend_logfile
 

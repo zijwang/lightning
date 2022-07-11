@@ -1,5 +1,4 @@
-"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with
-Lightning.
+"""The panel_serve_render_fn_or_file file gets run by Python to lunch a Panel Server with Lightning.
 
 These tests are for serving a render_fn function.
 """
@@ -8,11 +7,7 @@ from unittest import mock
 
 import pytest
 
-from lightning_app.frontend.panel.panel_serve_render_fn_or_file import (
-    _get_view_fn,
-    _render_fn_wrapper,
-    _serve,
-)
+from lightning_app.frontend.panel.panel_serve_render_fn_or_file import _get_view_fn, _render_fn_wrapper, _serve
 from lightning_app.frontend.utilities.app_state_watcher import AppStateWatcher
 
 
@@ -48,7 +43,7 @@ def test_get_view_fn():
 
 
 def render_fn_no_args():
-    """Test function with no arguments"""
+    """Test function with no arguments."""
     return "Hello"
 
 

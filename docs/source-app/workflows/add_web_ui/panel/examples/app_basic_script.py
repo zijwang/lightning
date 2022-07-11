@@ -1,20 +1,11 @@
-# app.py
-import panel as pn
-
-# Todo: change import
-# from lightning_app.frontend.panel import PanelFrontend
-from panel_frontend import PanelFrontend
-
 import lightning as L
+from lightning.app.frontend.panel import PanelFrontend
 
 
 class LitPanel(L.LightningFlow):
-    def __init__(self):
-        super().__init__()
-        self._frontend = PanelFrontend("panel_script.py")
 
     def configure_layout(self):
-        return self._frontend
+        return PanelFrontend("panel_script.py")
 
 
 class LitApp(L.LightningFlow):

@@ -3,7 +3,8 @@ import panel as pn
 
 # Todo: change import
 # from lightning_app.frontend.panel import PanelFrontend
-from panel_frontend import PanelFrontend
+from lightning.app.frontend.panel import PanelFrontend
+
 
 import lightning as L
 
@@ -13,12 +14,9 @@ def your_panel_app(app):
 
 
 class LitPanel(L.LightningFlow):
-    def __init__(self):
-        super().__init__()
-        self._frontend = PanelFrontend(your_panel_app)
 
     def configure_layout(self):
-        return self._frontend
+        return PanelFrontend(your_panel_app)
 
 
 class LitApp(L.LightningFlow):

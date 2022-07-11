@@ -1,13 +1,8 @@
-# app.py
 import datetime as dt
-
 import panel as pn
 from app_state_watcher import AppStateWatcher
-
-# Todo: change import
-from panel_frontend import PanelFrontend
-
 import lightning as L
+from lightning.app.frontend.panel import PanelFrontend
 
 pn.extension(sizing_mode="stretch_width")
 
@@ -25,8 +20,6 @@ def your_panel_app(app: AppStateWatcher):
 class LitPanel(L.LightningFlow):
     def __init__(self):
         super().__init__()
-
-        self._frontend = PanelFrontend(your_panel_app)
         self._last_update = dt.datetime.now()
         self.last_update = self._last_update.isoformat()
 
@@ -37,7 +30,7 @@ class LitPanel(L.LightningFlow):
             self.last_update = self._last_update.isoformat()
 
     def configure_layout(self):
-        return self._frontend
+        return PanelFrontend(your_panel_app)
 
 
 class LitApp(L.LightningFlow):

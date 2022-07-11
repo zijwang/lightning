@@ -161,6 +161,7 @@ tags
 
 # Lightning StreamlitFrontend or PanelFrontend
 .storage
-
-# Personal scripts
 script.*
+src/lightning_app/ui/*
+docs/source-app/api_reference/api/*
+docs/examples/*

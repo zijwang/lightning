@@ -8,7 +8,8 @@ from subprocess import Popen
 from typing import Dict, List, Optional
 
 from app_state_watcher import AppStateWatcher
-from panel_frontend import PanelFrontend
+from lightning.app.frontend.panel import PanelFrontend
+
 
 from lightning import BuildConfig, CloudCompute, LightningApp, LightningFlow
 from lightning.app import structures

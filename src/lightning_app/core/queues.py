@@ -5,7 +5,8 @@ import queue
 import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Optional
+from itertools import cycle
+from typing import Any, List, Optional
 
 from lightning_app.core.constants import (
     REDIS_HOST,
@@ -149,18 +150,29 @@ class BaseQueue(ABC):
         pass
 
 
+class QueueCollection(BaseQueue):
+    def __init__(self, name: str, queues: List[BaseQueue]):
+        self.name = name
+        self.queues = queues
+        self.iter_queue = cycle(self.queues)
+
+    def put(self, item):
+        for q in self.queues:
+            q.put(item)
+
+    def get(self, timeout: int = None):
+        return next(self.iter_queue).get(timeout=timeout)
+
+
 class SingleProcessQueue(BaseQueue):
     def __init__(self, name: str, default_timeout: float):
         self.name = name
-        self.default_timeout = default_timeout
         self.queue = queue.Queue()
 
     def put(self, item):
         self.queue.put(item)
 
     def get(self, timeout: int = None):
-        if timeout == 0:
-            timeout = self.default_timeout
         return self.queue.get(timeout=timeout, block=(timeout is None))
 
 

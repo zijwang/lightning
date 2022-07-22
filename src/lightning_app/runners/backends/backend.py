@@ -3,7 +3,7 @@ from functools import partial
 from typing import Any, Callable, List, Optional
 
 import lightning_app
-from lightning_app.core.queues import QueuingSystem
+from lightning_app.core.queues import QueueCollection, QueuingSystem
 from lightning_app.utilities.proxies import ProxyWorkRun, unwrap
 
 
@@ -83,9 +83,6 @@ class Backend(ABC):
         app.delta_queue = self.queues.get_delta_queue(**kw)
         app.readiness_queue = self.queues.get_readiness_queue(**kw)
         app.error_queue = self.queues.get_error_queue(**kw)
-        app.delta_queue = self.queues.get_delta_queue(**kw)
-        app.readiness_queue = self.queues.get_readiness_queue(**kw)
-        app.error_queue = self.queues.get_error_queue(**kw)
         app.api_publish_state_queue = self.queues.get_api_state_publish_queue(**kw)
         app.api_delta_queue = self.queues.get_api_delta_queue(**kw)
         app.request_queues = {}
@@ -96,12 +93,26 @@ class Backend(ABC):
         app.work_queues = {}
 
     def _register_queues(self, app, work):
-        kw = dict(queue_id=self.queue_id, work_name=work.name)
-        app.request_queues.update({work.name: self.queues.get_orchestrator_request_queue(**kw)})
-        app.response_queues.update({work.name: self.queues.get_orchestrator_response_queue(**kw)})
-        app.copy_request_queues.update({work.name: self.queues.get_orchestrator_copy_request_queue(**kw)})
-        app.copy_response_queues.update({work.name: self.queues.get_orchestrator_copy_response_queue(**kw)})
-        app.caller_queues.update({work.name: self.queues.get_caller_queue(**kw)})
+        if work.replicas > 1:
+            work_names = [f"{work.name}.{i}" for i in range(work.replicas)]
+        else:
+            work_names = [work.name]
+
+        for work_name in work_names:
+            self._register_work_queues(app, work_name)
+
+        if work.replicas > 1:
+            caller_queues = [app.caller_queues[name] for name in work_names]
+            queue_collection = QueueCollection(name=work.name, queues=caller_queues)
+            app.caller_queues.update({work.name: queue_collection})
+
+    def _register_work_queues(self, app, work_name):
+        kw = dict(queue_id=self.queue_id, work_name=work_name)
+        app.request_queues.update({work_name: self.queues.get_orchestrator_request_queue(**kw)})
+        app.response_queues.update({work_name: self.queues.get_orchestrator_response_queue(**kw)})
+        app.copy_request_queues.update({work_name: self.queues.get_orchestrator_copy_request_queue(**kw)})
+        app.copy_response_queues.update({work_name: self.queues.get_orchestrator_copy_response_queue(**kw)})
+        app.caller_queues.update({work_name: self.queues.get_caller_queue(**kw)})
 
 
 class WorkManager(ABC):

@@ -45,6 +45,7 @@ class LightningWork(abc.ABC):
         cloud_build_config: Optional[BuildConfig] = None,
         cloud_compute: Optional[CloudCompute] = None,
         run_once: Optional[bool] = None,  # TODO: Remove run_once
+        replicas: int = 1,
     ):
         """LightningWork, or Work in short, is a building block for long-running jobs.
 
@@ -111,6 +112,7 @@ class LightningWork(abc.ABC):
         self._changes = {}
         self._raise_exception = raise_exception
         self._paths = {}
+        self._replicas = replicas
         self._request_queue: Optional[BaseQueue] = None
         self._response_queue: Optional[BaseQueue] = None
         self._restarting = False
@@ -148,6 +150,10 @@ class LightningWork(abc.ABC):
         Locally, the address is 127.0.0.1 and in the cloud it will be determined by the cluster.
         """
         return self._internal_ip
+
+    @property
+    def replicas(self) -> int:
+        return self._replicas
 
     def _on_init_end(self):
         self._local_build_config.on_work_init(self)

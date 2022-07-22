@@ -884,3 +884,25 @@ def test_slow_flow():
     )
 
     MultiProcessRuntime(app1).dispatch()
+
+
+class WorkM(LightningWork):
+    def __init__(self):
+        super().__init__(replicas=4)
+
+    def run(self):
+        pass
+
+
+class FlowM(LightningFlow):
+    def __init__(self):
+        super().__init__()
+        self.work = WorkM()
+
+    def run(self):
+        self.work.run()
+
+
+def test_multi_queues():
+    app = LightningApp(FlowM())
+    MultiProcessRuntime(app).dispatch()

@@ -171,3 +171,10 @@ jobs:
       with:
         name: unittest-results-${{ runner.os }}-py${{ matrix.python-version }}-${{ matrix.requires }}-${{ matrix.release }}
         path: tests/tests_pytorch/results-${{ runner.os }}-py${{ matrix.python-version }}-${{ matrix.requires }}-${{ matrix.release }}.xml
+
+  result:
+    needs: cpu
+    runs-on: ubuntu-20.04
+
+    steps:
+    - run: echo hi.

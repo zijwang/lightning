@@ -34,4 +34,3 @@ if not os.path.isdir(_TEMP_PATH):
     os.mkdir(_TEMP_PATH)
 
 logging.basicConfig(level=logging.ERROR)
-# asdf

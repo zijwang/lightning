@@ -29,9 +29,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the config used in '.azure-pipelines/gpu-tests.yml' since the Dockerfile uses the cuda image
-        python_version: ["3.9"]
-        pytorch_version: ["1.12"]
+        # This matrix should match the one in release-docker.yml.
+        include:
+          - {python_version: "3.9", pytorch_version: "1.9"}
+          - {python_version: "3.9", pytorch_version: "1.10"}
+          - {python_version: "3.9", pytorch_version: "1.11"}
+          - {python_version: "3.9", pytorch_version: "1.12"}
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v2
@@ -84,13 +87,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # We only release one docker image per PyTorch version.
+        # This is the base for PL images released from release-docker.yml,
+        # so this matrix needs to include all of the combinations here.
+        # the config used in '.azure-pipelines/gpu-tests.yml'
+        # We only release one docker image per PyTorch version.
         include:
-          # the config used in '.azure-pipelines/gpu-tests.yml'
-          - {python_version: "3.9", pytorch_version: "1.12", cuda_version: "11.3.1", ubuntu_version: "20.04"}
-          # latest (used in Tutorials)
-          - {python_version: "3.8", pytorch_version: "1.9", cuda_version: "11.1.1", ubuntu_version: "20.04"}
-          - {python_version: "3.9", pytorch_version: "1.10", cuda_version: "11.1.1", ubuntu_version: "20.04"}
-          - {python_version: "3.9", pytorch_version: "1.11", cuda_version: "11.3.1", ubuntu_version: "20.04"}
+          - {python_version: "3.9", pytorch_version: "1.9", cuda_version: "11.1.1"}
+          - {python_version: "3.9", pytorch_version: "1.10", cuda_version: "11.1.1"}
+          - {python_version: "3.9", pytorch_version: "1.11", cuda_version: "11.3.1"}
+          - {python_version: "3.9", pytorch_version: "1.12", cuda_version: "11.3.1"}
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v2

@@ -15,8 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: ["3.7", "3.8", "3.9"]
-        pytorch_version: ["1.9", "1.10"]
+        # We only release one docker image per PyTorch version.
+        include:
+          - {python_version: "3.9", pytorch_version: "1.9"}
+          - {python_version: "3.9", pytorch_version: "1.10"}
+          - {python_version: "3.9", pytorch_version: "1.11"}
+          - {python_version: "3.9", pytorch_version: "1.12"}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

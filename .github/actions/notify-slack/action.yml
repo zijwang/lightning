@@ -1,0 +1,28 @@
+name: Notify on Slack
+description: Notify users on Slack
+
+inputs:
+  github-token:
+    description: GITHUB_TOKEN
+    required: true
+  slack-webhook-url:
+    description: SLACK_WEBHOOK_URL to use ravsamhq/notify-slack-action.
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+  - name: Map users
+    run: pip install "twine==4.0.1" setuptools wheel flake8
+    shell: bash
+
+  - name: Notify users on Slack
+    uses: ravsamhq/notify-slack-action@v1
+    with:
+      status: ${{ job.status }}
+      token: ${{ secrets.GITHUB_TOKEN }}
+      notification_title: ${{ format('XLA; {0} py{1} for *{2}*', runner.os, matrix.python_version, matrix.xla_version) }}
+      message_format: '{emoji} *{workflow}* {status_message}, see <{run_url}|detail>, cc: <@U01A5T7EY9M>'  # akihironitta
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -641,5 +641,5 @@ class LightningFlow:
         """Override to return any required metadata for reloading."""
         return None
 
-    def on_load_state_dict(self, children_states: Dict[str, Any], extras: Optional[Dict[str, Any]]) -> None:
+    def on_load_state_dict(self, children_states: Dict[str, Any], extras: Optional[Dict[str, Any]] = None) -> None:
         """Override to add your re-instantiation logic for dynamic components."""

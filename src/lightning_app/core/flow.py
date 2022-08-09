@@ -13,7 +13,7 @@ from lightning_app.storage.drive import _maybe_create_drive, Drive
 from lightning_app.utilities.app_helpers import _is_json_serializable, _LightningAppRef, _set_child_name
 from lightning_app.utilities.component import _sanitize_state
 from lightning_app.utilities.exceptions import ExitAppException
-from lightning_app.utilities.introspection import _is_init_context, _is_run_context
+from lightning_app.utilities.introspection import _is_init_context, _is_on_load_state_dict_context, _is_run_context
 
 
 class LightningFlow:
@@ -118,7 +118,10 @@ class LightningFlow:
             and name not in self._paths
             and (
                 not isinstance(value, (LightningWork, LightningFlow))
-                or (isinstance(value, (LightningWork, LightningFlow)) and not _is_run_context(self))
+                or (
+                    isinstance(value, (LightningWork, LightningFlow))
+                    and not (_is_run_context(self) or _is_on_load_state_dict_context(self))
+                )
             )
             and name not in self._works.union(self._flows)
             and self._is_state_attribute(name)

@@ -309,7 +309,7 @@ class LightningFlow:
         self.get_all_children_(children)
         return children
 
-    def set_state(self, provided_state: Dict, recurse: bool = False) -> None:
+    def set_state(self, provided_state: Dict, recurse: bool = True) -> None:
         """Method to set the state to this LightningFlow, its children and
         :class:`~lightning_app.core.work.LightningWork`."""
         for k, v in provided_state["vars"].items():

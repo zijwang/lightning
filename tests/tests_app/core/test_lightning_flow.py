@@ -698,7 +698,12 @@ class RootFlowReload(LightningFlow):
         self.counter += 1
 
     def on_save_state_dict(self):
-        return {"flow_2": {"work_cls_module": WorkReload.__module__, "work_cls_name": WorkReload.__name__}}
+        return {
+            "flow_2": {
+                "work_cls_module": WorkReload.__module__,
+                "work_cls_name": WorkReload.__name__,
+            }
+        }
 
     def on_load_state_dict(self, children_states, extras) -> None:
         work_cls_module = extras["flow_2"]["work_cls_module"]

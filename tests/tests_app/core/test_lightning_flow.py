@@ -1,5 +1,6 @@
 import os
 import pickle
+import sys
 from collections import Counter
 from copy import deepcopy
 from dataclasses import dataclass
@@ -662,26 +663,25 @@ class FlowReload(LightningFlow):
         self.counter += 1
         self.w.run()
 
-    def load_state_dict(self, flow_state, children_states) -> None:
+    def on_load_state_dict(self, *_) -> None:
         self.w = WorkReload()
-        super().load_state_dict(flow_state, children_states)
 
 
 class FlowReload2(LightningFlow):
-    def __init__(self, random_value: str):
+    def __init__(self, work_cls, random_string):
         super().__init__()
-        self.random_value = random_value
+        self._work_cls = work_cls
         self.counter = 0
+        self.random_string = random_string
 
     def run(self):
         if not getattr(self, "w", None):
-            self.w = WorkReload()
+            self.w = self._work_cls()
         self.w.run()
         self.counter += 1
 
-    def load_state_dict(self, flow_state, children_states) -> None:
+    def on_load_state_dict(self, *_) -> None:
         self.w = WorkReload()
-        super().load_state_dict(flow_state, children_states)
 
 
 class RootFlowReload(LightningFlow):
@@ -692,14 +692,19 @@ class RootFlowReload(LightningFlow):
 
     def run(self):
         if not getattr(self, "flow_2", None):
-            self.flow_2 = FlowReload2("something")
+            self.flow_2 = FlowReload2(WorkReload, "something")
         self.flow.run()
         self.flow_2.run()
         self.counter += 1
 
-    def load_state_dict(self, flow_state, children_states) -> None:
-        self.flow_2 = FlowReload2(children_states["flow_2"]["vars"]["random_value"])
-        super().load_state_dict(flow_state, children_states)
+    def on_save_state_dict(self):
+        return {"flow_2": {"work_cls_module": WorkReload.__module__, "work_cls_name": WorkReload.__name__}}
+
+    def on_load_state_dict(self, children_states, extras) -> None:
+        work_cls_module = extras["flow_2"]["work_cls_module"]
+        work_cls_name = extras["flow_2"]["work_cls_name"]
+        work_cls = getattr(sys.modules[work_cls_module], work_cls_name)
+        self.flow_2 = FlowReload2(work_cls, children_states["flow_2"]["random_string"])
 
 
 def test_lightning_flow_reload():

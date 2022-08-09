@@ -309,7 +309,7 @@ class LightningFlow:
         self.get_all_children_(children)
         return children
 
-    def set_state(self, provided_state: Dict) -> None:
+    def set_state(self, provided_state: Dict, recurse: bool = False) -> None:
         """Method to set the state to this LightningFlow, its children and
         :class:`~lightning_app.core.work.LightningWork`."""
         for k, v in provided_state["vars"].items():
@@ -318,12 +318,14 @@ class LightningFlow:
             setattr(self, k, v)
         self._changes = provided_state["changes"]
         self._calls.update(provided_state["calls"])
-        for child, state in provided_state["flows"].items():
-            getattr(self, child).set_state(state)
-        for work, state in provided_state["works"].items():
-            getattr(self, work).set_state(state)
-        for structure, state in provided_state["structures"].items():
-            getattr(self, structure).set_state(state)
+
+        if recurse:
+            for child, state in provided_state["flows"].items():
+                getattr(self, child).set_state(state)
+            for work, state in provided_state["works"].items():
+                getattr(self, work).set_state(state)
+            for structure, state in provided_state["structures"].items():
+                getattr(self, structure).set_state(state)
 
     def _exit(self, end_msg: str = "") -> None:
         """Private method used to exit the application."""
@@ -635,30 +637,9 @@ class LightningFlow:
         """
         raise NotImplementedError
 
-    def state_dict(self):
-        """Returns the current flow state but not its children."""
-        return {
-            "vars": _sanitize_state({el: getattr(self, el) for el in self._state}),
-            "calls": self._calls.copy(),
-            "changes": {},
-            "flows": {},
-            "works": {},
-            "structures": {},
-        }
+    def on_save_state_dict(self) -> Optional[Dict[str, Any]]:
+        """Override to return any required metadata for reloading."""
+        return None
 
-    def load_state_dict(self, flow_state: Dict[str, Any], children_states: Dict[str, Any]) -> None:
-        self.set_state(flow_state)
-        direct_children_states = {k: v for k, v in children_states.items() if "." not in k}
-        for child_name, state in direct_children_states.items():
-            child = getattr(self, child_name, None)
-            if isinstance(child, LightningFlow):
-                lower_children_states = {
-                    k.replace(child_name + ".", ""): v
-                    for k, v in children_states.items()
-                    if k.startswith(child_name) and k != child_name
-                }
-                child.load_state_dict(state, lower_children_states)
-            elif isinstance(child, LightningWork):
-                child.load_state_dict(state)
-            else:
-                raise Exception(f"The component {child} isn't supported.")
+    def on_load_state_dict(self, children_states: Dict[str, Any], extras: Optional[Dict[str, Any]]) -> None:
+        """Override to add your re-instantiation logic for dynamic components."""

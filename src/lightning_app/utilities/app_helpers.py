@@ -407,10 +407,60 @@ def _state_dict(flow: "LightningFlow"):
     state = {}
     flows = [flow] + list(flow.flows.values())
     for f in flows:
-        state[f.name] = f.state_dict()
+        state[f.name] = f.state
+        extras = f.on_save_state_dict()
+        if extras:
+            state[f.name].update({"extras": extras})
     for w in flow.works():
-        state[w.name] = w.state_dict()
+        state[w.name] = w.state
     return state
+
+
+def __load_state_dict(
+    flow,
+    flow_state: Dict[str, Any],
+    children_states: Dict[str, Any],
+    error_messages: List[Tuple[str, str]],
+) -> None:
+    """This method enables to reload the state of components."""
+    from lightning import LightningFlow, LightningWork
+
+    # 1: Extract information to re-instantiate the components.
+    extras = flow_state.get("extras", None)
+    var_children_states = {k: v["vars"] for k, v in children_states.items()}
+
+    # 2: Reset the state of the component
+    flow.set_state(flow_state, recurse=False)
+
+    # 3: If the component has extras or any dynamic component.
+    if var_children_states or extras:
+        flow.on_load_state_dict(var_children_states, extras)
+
+    # 4: Collect direct children state
+    direct_children_states = {k: v for k, v in children_states.items() if "." not in k}
+
+    # 5: Iterate over all direct children
+    for child_name, state in direct_children_states.items():
+        child = getattr(flow, child_name, None)
+
+        if isinstance(child, LightningFlow):
+            # 6: Collect the dynamic children state associated to this child flow.
+            # Transmitting the ownership of re-instantiation down.
+            new_children_states = {
+                k.replace(child_name + ".", ""): v
+                for k, v in children_states.items()
+                if k.startswith(child_name) and k != child_name
+            }
+            # 7: Recursive call
+            __load_state_dict(child, state, new_children_states, error_messages)
+
+        elif isinstance(child, LightningWork):
+            # 8: Set the state on the work.
+            child.set_state(state)
+
+        else:
+            # 9: Collect any error messages.
+            error_messages.append((flow.name, child_name))
 
 
 def _load_state_dict(root_flow: "LightningFlow", state: Dict[str, Any], strict: bool = True) -> None:
@@ -425,7 +475,7 @@ def _load_state_dict(root_flow: "LightningFlow", state: Dict[str, Any], strict: 
     """
     # 1: Reload the state of the existing works
     for w in root_flow.works():
-        w.load_state_dict(state.pop(w.name))
+        w.set_state(state.pop(w.name))
 
     # 2: Collect the existing flows
     flows = [root_flow] + list(root_flow.flows.values())
@@ -452,15 +502,15 @@ def _load_state_dict(root_flow: "LightningFlow", state: Dict[str, Any], strict: 
             if has_matched:
                 break
 
+    error_messages = []
+
     # 5: Reload the flow states
     for flow_name, flow in flow_map.items():
-        flow.load_state_dict(state.pop(flow_name), dynamic_children_state[flow_name])
+        __load_state_dict(flow, state.pop(flow_name), dynamic_children_state[flow_name], error_messages)
 
     # 6: Verify all dynamic components has been re-created.
-    if strict:
-        components_names = (
-            [root_flow.name] + [f.name for f in root_flow.flows.values()] + [w.name for w in root_flow.works()]
-        )
-        for component_name in dynamic_components:
-            if component_name not in components_names:
-                raise Exception(f"The component {component_name} was re-created during state reloading.")
+    if error_messages:
+        msg = f"Found the following errors while reloading the state: {error_messages}"
+        if strict:
+            raise Exception(msg)
+        logger.info(msg)

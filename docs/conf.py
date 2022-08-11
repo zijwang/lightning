@@ -17,7 +17,6 @@ from pathlib import Path
 
 import pt_lightning_sphinx_theme
 
-
 _PATH_HERE = Path(__file__).absolute().parent
 _PATH_ROOT = _PATH_HERE.parent
 SPHINX_MOCK_REQUIREMENTS = int(os.environ.get("SPHINX_MOCK_REQUIREMENTS", True))
@@ -50,7 +49,7 @@ needs_sphinx = "4.5"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-   "multiproject",
+    "multiproject",
     "sphinx.ext.autodoc",
     # 'sphinxcontrib.mockautodoc',  # raises error: directive 'automodule' is already registered ...
     # 'sphinxcontrib.fulltoc',  # breaks pytorch-theme with unexpected kw argument 'titles_only'
@@ -178,7 +177,7 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    'pointsize': '10pt',
+    "pointsize": "10pt",
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
     # Latex figure (float) alignment

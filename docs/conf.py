@@ -10,34 +10,25 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-import glob
 import inspect
 import os
-import shutil
 import sys
 from pathlib import Path
 
 import pt_lightning_sphinx_theme
 
-import lightning_app
 
 _PATH_HERE = Path(__file__).absolute().parent
-_PATH_ROOT = _PATH_HERE.parent.parent
-sys.path.insert(0, os.path.abspath(_PATH_ROOT))
-
+_PATH_ROOT = _PATH_HERE.parent
 SPHINX_MOCK_REQUIREMENTS = int(os.environ.get("SPHINX_MOCK_REQUIREMENTS", True))
 
 # -- Project information -----------------------------------------------------
 
 # this name shall match the project name in Github as it is used for linking to code
 project = "lightning"
-copyright = lightning_app.__copyright__
-author = lightning_app.__author__
-
-# The short X.Y version
-version = lightning_app.__version__
-# The full version, including alpha/beta/rc tags
-release = lightning_app.__version__
+author = "Lightning-AI"
+homepage = "https://lightning.ai/"
+docs_url = "https://lightning.ai/lightning-docs/"
 
 # Options for the linkcode extension
 # ----------------------------------
@@ -46,22 +37,6 @@ github_repo = project
 
 # -- Project documents -------------------------------------------------------
 
-
-# def _transform_changelog(path_in: str, path_out: str) -> None:
-#     with open(path_in) as fp:
-#         chlog_lines = fp.readlines()
-#     # enrich short subsub-titles to be unique
-#     chlog_ver = ""
-#     for i, ln in enumerate(chlog_lines):
-#         if ln.startswith("## "):
-#             chlog_ver = ln[2:].split("-")[0].strip()
-#         elif ln.startswith("### "):
-#             ln = ln.replace("###", f"### {chlog_ver} -")
-#             chlog_lines[i] = ln
-#     with open(path_out, "w") as fp:
-#         fp.writelines(chlog_lines)
-
-
 # export the READme
 # _convert_markdown(os.path.join(_PATH_ROOT, "README.md"), "readme.md")
 
@@ -69,12 +44,13 @@ github_repo = project
 
 # If your documentation needs a minimal Sphinx version, state it here.
 
-# needs_sphinx = "4.5"
+needs_sphinx = "4.5"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+   "multiproject",
     "sphinx.ext.autodoc",
     # 'sphinxcontrib.mockautodoc',  # raises error: directive 'automodule' is already registered ...
     # 'sphinxcontrib.fulltoc',  # breaks pytorch-theme with unexpected kw argument 'titles_only'
@@ -88,17 +64,27 @@ extensions = [
     "sphinx.ext.imgmath",
     "myst_parser",
     "sphinx.ext.autosectionlabel",
-    "nbsphinx",
+    # "nbsphinx",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "sphinx_paramlinks",
     "sphinx_togglebutton",
     "sphinx.ext.githubpages",
-    "pt_lightning_sphinx_theme.extensions.lightning",
 ]
 
+multiproject_projects = {
+    "app": {
+        "path": "source-app",  # Set a custom path
+        "use_config_file": True,
+    },
+    "pytorch": {
+        "path": "source-pytorch",  # Set a custom path
+        "use_config_file": True,
+    },
+}
+
 # Add any paths that contain templates here, relative to this directory.
-templates_path = [str(_PATH_HERE / "_templates")]
+templates_path = ["_templates"]
 
 myst_update_mathjax = False
 
@@ -139,7 +125,6 @@ exclude_patterns = [
     "PULL_REQUEST_TEMPLATE.md",
     "**/README.md/*",
     "readme.md",
-    "code_samples/convert_pl_to_app/requirements.txt",
 ]
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -158,19 +143,19 @@ html_theme_path = [pt_lightning_sphinx_theme.get_html_theme_path()]
 # documentation.
 
 html_theme_options = {
-    "pytorch_project": lightning_app.__homepage__,
-    "canonical_url": lightning_app.__homepage__,
+    "pytorch_project": homepage,
+    "canonical_url": homepage,
     "collapse_navigation": False,
     "display_version": True,
     "logo_only": False,
 }
 
-html_favicon = str(_PATH_HERE / "_static" / "images" / "icon.svg")
+# html_favicon = "_static/images/icon.svg"  # TODO
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [str(_PATH_HERE / "_templates"), str(_PATH_HERE / "_static")]
+# html_static_path = ["_templates", "_static"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -193,7 +178,7 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    # 'pointsize': '10pt',
+    'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
     # Latex figure (float) alignment
@@ -225,7 +210,7 @@ texinfo_documents = [
         project + " Documentation",
         author,
         project,
-        lightning_app.__docs__,
+        docs_url,
         "Miscellaneous",
     ),
 ]
@@ -254,14 +239,14 @@ epub_exclude_files = ["search.html"]
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "torch": ("https://pytorch.org/docs/stable/", None),
+    # "torch": ("https://pytorch.org/docs/stable/", None),
     # "numpy": ("https://docs.scipy.org/doc/numpy/", None),
 }
 
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
+todo_include_todos = False
 
 
 def setup(app):
@@ -269,24 +254,6 @@ def setup(app):
     # see: http://z4r.github.io/python/2011/12/02/hides-the-prompts-and-output/
     app.add_js_file("copybutton.js")
     app.add_css_file("main.css")
-
-
-# copy all notebooks to local folder
-path_nbs = str(_PATH_HERE / "notebooks")
-if not os.path.isdir(path_nbs):
-    os.mkdir(path_nbs)
-for path_ipynb in glob.glob(os.path.join(_PATH_ROOT, "notebooks", "*.ipynb")):
-    path_ipynb2 = os.path.join(path_nbs, os.path.basename(path_ipynb))
-    shutil.copy(path_ipynb, path_ipynb2)
-
-# copy all examples to local folder
-path_examples = str(_PATH_HERE.parent / "examples")
-if not os.path.isdir(path_examples):
-    os.mkdir(path_examples)
-for path_app_example in glob.glob(os.path.join(_PATH_ROOT, "examples", "app_*")):
-    path_app_example2 = os.path.join(path_examples, os.path.basename(path_app_example))
-    if not os.path.isdir(path_app_example2):
-        shutil.copytree(path_app_example, path_app_example2, dirs_exist_ok=True)
 
 
 # Ignoring Third-party packages
@@ -310,7 +277,7 @@ PACKAGE_MAPPING = {
 MOCK_PACKAGES = []
 if SPHINX_MOCK_REQUIREMENTS:
     # mock also base packages when we are on RTD since we don't install them there
-    MOCK_PACKAGES += _package_list_from_file(os.path.join(_PATH_ROOT, "requirements.txt"))
+    MOCK_PACKAGES += _package_list_from_file(str(_PATH_ROOT / "requirements" / "base.txt"))
 MOCK_PACKAGES = [PACKAGE_MAPPING.get(pkg, pkg) for pkg in MOCK_PACKAGES]
 
 autodoc_mock_imports = MOCK_PACKAGES
@@ -386,7 +353,6 @@ autosectionlabel_prefix_document = True
 # only run doctests marked with a ".. doctest::" directive
 doctest_test_doctest_blocks = ""
 doctest_global_setup = """
-import importlib
 import os
 import lightning as L
 """

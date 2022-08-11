@@ -105,18 +105,18 @@ jobs:
         shell: bash
 
       - name: Make Documentation
-        working-directory: ./docs/source-${{ matrix.pkg }}
+        working-directory: ./docs
         env:
           PROJECT: ${{ matrix.pkg }}
         run: |
           # ToDo: rather use python cmd
           # First run the same pipeline as Read-The-Docs
-          make html --debug --jobs $(nproc) SPHINXOPTS="-W --keep-going"
+          sphinx-build -M html . _build -W --keep-going  # --debug --jobs $(nproc)
 
       - name: Upload built docs
         uses: actions/upload-artifact@v3
         with:
           name: docs-results-${{ github.sha }}
-          path: docs/build/html/
+          path: docs/_build/html/
         # Use always() to always run this step to publish test results when there are test failures
         if: success()

@@ -99,6 +99,7 @@ if current_project == "app":
     ]
 elif current_project == "pytorch":
     import pytorch_lightning
+
     # TODO
     project = "PyTorch Lightning"
     copyright = pytorch_lightning.__copyright__

@@ -210,6 +210,8 @@ async def post_state(
     x_lightning_session_uuid: Optional[str] = Header(None),
     x_lightning_session_id: Optional[str] = Header(None),
 ) -> None:
+    """This endpoint is used to make an update to the app state using an updated state """
+
     if x_lightning_session_uuid is None:
         raise Exception("Missing X-Lightning-Session-UUID header")
     if x_lightning_session_id is None:
@@ -239,8 +241,6 @@ async def post_state(
 async def healthz(response: Response):
     """Health check endpoint used in the cloud FastAPI servers to check the status periodically. This requires
     Redis to be installed for it to work.
-
-    # TODO - Once the state store abstraction is in, check that too
     """
     if not _is_redis_available():
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -263,6 +263,7 @@ async def healthz(response: Response):
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
+        # Question: What is this counter? And who updates it?
         counter = global_app_state_store.counter
         while True:
             if global_app_state_store.counter != counter:

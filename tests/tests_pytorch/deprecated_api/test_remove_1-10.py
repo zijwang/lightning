@@ -15,6 +15,7 @@
 import pytest
 
 from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks.progress.base import get_standard_metrics, ProgressBarBase
 from pytorch_lightning.demos.boring_classes import BoringModel
 from pytorch_lightning.overrides import LightningDistributedModule, LightningParallelModule
 from pytorch_lightning.overrides.base import unwrap_lightning_module
@@ -69,3 +70,15 @@ def test_v1_10_deprecated_unwrap_lightning_module_sharded():
 def test_v1_10_deprecated_on_colab_kaggle_func():
     with pytest.deprecated_call(match="The function `on_colab_kaggle` has been deprecated in v1.8.0"):
         on_colab_kaggle()
+
+
+def test_v1_10_deprecated_progress_bar_base():
+    with pytest.deprecated_call(match="callbacks.progress.base.ProgressBarBase` was deprecated in v1.8.0"):
+        ProgressBarBase()
+
+
+def test_v1_10_deprecated_progress_get_standard_metrics():
+    trainer = Trainer()
+    pl_module = BoringModel()
+    with pytest.deprecated_call(match=r"callbacks.progress.base.get_standard_metrics` was deprecated in v1.8.0"):
+        get_standard_metrics(trainer, pl_module)

@@ -1,7 +1,7 @@
 # Lightning Docs
 
 ## Developing docs
-Guide on how to build the documentation for local development:
+Guide on how to build the documentation for local development:    
 https://www.loom.com/share/2e76517725584713a36ccecf608dda0d
 
 First, install the docs dependencies
@@ -84,19 +84,6 @@ Notes:
   - on Ubuntu (Linux) run `sudo apt-get update && sudo apt-get install -y texlive-latex-extra dvipng texlive-pictures`
   - use the [RTD docker image](https://hub.docker.com/r/readthedocs/build)
 - You need to have pandoc installed for rendering Jupyter Notebooks. On Ubuntu (Linux), you can run: `sudo apt-get install pandoc`
-
-## Developing docs
-
-When developing the docs, building docs can be VERY slow locally because of the notebook tutorials.
-To speed this up, enable this flag in before building docs:
-
-```bash
-# builds notebooks which is slow
-export PL_FAST_DOCS_DEV=0
-
-# fast notebook build which is fast
-export PL_FAST_DOCS_DEV=1
-```
 
 ## docs CSS/theme
 

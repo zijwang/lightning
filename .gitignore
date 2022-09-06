@@ -5,6 +5,7 @@ model_weights/
 pip-wheel-metadata/
 lightning_logs/
 .vscode/
+node_modules
 
 # Documentations
 docs/source-app/generated

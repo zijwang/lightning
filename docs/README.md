@@ -1,4 +1,31 @@
-# PyTorch-Lightning Docs
+# Lightning Docs
+
+## Developing docs
+Guide on how to build the documentation for local development:
+https://www.loom.com/share/2e76517725584713a36ccecf608dda0d
+
+First, install the docs dependencies
+```bash
+cd lightning
+pip install -r requirements/docs.txt
+```
+
+Next, we recommend you disable building notebook docs locally
+```bash
+# builds notebooks which is slow
+export PL_FAST_DOCS_DEV=0
+
+# fast notebook build which is fast
+export PL_FAST_DOCS_DEV=1
+```
+
+Finally, run the interactive development
+```bash
+cd lightning
+sphinx-autobuild docs/source-pytorch/ docs/source-pytorch/build
+```
+
+## Style-guide
 
 We are using Sphinx with Napoleon extension.
 Moreover, we set Google style to follow with type convention.

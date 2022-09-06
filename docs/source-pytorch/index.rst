@@ -12,8 +12,9 @@ Welcome to ⚡ Lightning
          :alt: Animation showing how to convert a standard training loop to a Lightning loop
    :right:
       Lightning is the `open-source ML framework <https://github.com/Lightning-AI/lightning>`_ 
-      to build AI models and connect them with the ML lifecycle using Lightning workflows templates, 
-      without handling DIY infrastructure, cost management, scaling, and other headaches.
+      to build AI models and connect them with the ML lifecycle using Lightning workflow templates.
+      Focus on machine learning, Lightning handles the DIY infrastructure, 
+      cost management, scaling, and other operational headaches.
 
 .. raw:: html
 

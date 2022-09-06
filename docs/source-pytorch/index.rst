@@ -3,16 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ⚡ PyTorch Lightning
-===============================
+Welcome to ⚡ Lightning
+======================
 
 .. twocolumns::
    :left:
       .. image:: https://pl-flash-data.s3.amazonaws.com/assets_lightning/Lightning.gif
          :alt: Animation showing how to convert a standard training loop to a Lightning loop
    :right:
-      The `open-source Lightning framework <https://github.com/Lightning-AI/lightning>`_ gives ML Researchers and Data Scientists, the fastest & most flexible
-      way to iterate on ML research ideas and deliver scalable ML systems with the performance enterprises requires at the same time.
+      Lightning is the `open-source ML framework <https://github.com/Lightning-AI/lightning>`_ 
+      to build AI models and connect them with the ML lifecycle using Lightning workflows templates, 
+      without handling DIY infrastructure, cost management, scaling, and other headaches.
 
 .. raw:: html
 
@@ -170,11 +171,17 @@ Current Lightning Users
 
 .. toctree::
    :maxdepth: 1
+   :caption: Home
+
+   self
+
+.. toctree::
+   :maxdepth: 1
    :name: start
    :caption: Get Started
 
-   starter/introduction
    starter/installation
+   starter/introduction
 
 
 .. toctree::

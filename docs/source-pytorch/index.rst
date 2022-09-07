@@ -3,16 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ⚡ PyTorch Lightning
+Welcome to ⚡ Lightning
 ===============================
+
+.. raw:: html
+
+   <div 
+      style="width: 100%; background: #D7F5D5; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #050505; font-size: 16px">
+      <p style="margin-bottom: 5px">PyTorch Lightning has been renamed "Lightning" 🥳</p>
+   </div>
 
 .. twocolumns::
    :left:
       .. image:: https://pl-flash-data.s3.amazonaws.com/assets_lightning/Lightning.gif
          :alt: Animation showing how to convert a standard training loop to a Lightning loop
    :right:
-      The `open-source Lightning framework <https://github.com/Lightning-AI/lightning>`_ gives ML Researchers and Data Scientists, the fastest & most flexible
-      way to iterate on ML research ideas and deliver scalable ML systems with the performance enterprises requires at the same time.
+      Lightning (previously PyTorch Lightning) is the fastest & most flexible
+      way to train & build PyTorch models, research workflows (NEW) and production pipelines (NEW).
 
 .. raw:: html
 
@@ -38,9 +45,6 @@ Welcome to ⚡ PyTorch Lightning
 
 Install Lightning
 -----------------
-
-These commands install the entire Lightning framework.
-
 
 .. raw:: html
 
@@ -69,7 +73,9 @@ Conda users
       </div>
    </div>
 
-Or read the `advanced install guide <starter/installation.html>`_ to install only the PyTorch Lightning framework.
+For custom installation use the `advanced install guide <starter/installation.html>`_.
+
+.. note:: pip install pytorch-lightning has been deprecated and will stop being supported on June 2023.
 
 .. raw:: html
 
@@ -80,30 +86,42 @@ Get Started
 
 .. raw:: html
 
-    <div class="tutorials-callout-container">
+    <div class="display-card-container">
         <div class="row">
 
 .. Add callout items below this line
 
-.. customcalloutitem::
-   :description: Learn the 7 key steps of a typical Lightning workflow.
+.. displayitem::
    :header: Lightning in 15 minutes
-   :button_link:  starter/introduction.html
+   :description: Learn the 7 key steps of working with Lightning.
+   :col_css: col-md-12
+   :button_link: starter/introduction.html
+   :height: 160
+   :tag: All users
 
-.. customcalloutitem::
-   :description: Jumpstart from the App Gallery
-   :header: Start from Ready-to-Run Template Apps
-   :button_link: starter/jumpstart_from_app_gallery.html
+.. displayitem::
+   :header: PyTorch Models
+   :description: Build, train, finetune and deploy PyTorch models.
+   :col_css: col-md-4
+   :button_link: ../cli/lightning_cli_advanced_2.html
+   :height: 160
+   :tag: All users
 
-.. customcalloutitem::
-   :description: Use an existing App template for your model
-   :header: Start with the *Training and Demo* App
-   :button_link: starter/go_beyond_training.html
+.. displayitem::
+   :header: Research workflows (new)
+   :description: Organize your research with reactive workflows.
+   :col_css: col-md-4
+   :button_link: ../cli/lightning_cli_advanced_2.html
+   :height: 160
+   :tag: Researchers
 
-.. customcalloutitem::
-   :description: Learn how to benchmark PyTorch Lightning.
-   :header: Benchmarking
-   :button_link: benchmarking/benchmarks.html
+.. displayitem::
+   :header: Production Pipelines (new)
+   :description: Deploy models, and complex ML workflows with reactive workflows.
+   :col_css: col-md-4
+   :button_link: ../cli/lightning_cli_advanced_2.html
+   :height: 160
+   :tag: ML Engineers
 
 .. raw:: html
 
@@ -127,14 +145,9 @@ Current Lightning Users
 .. Add callout items below this line
 
 .. customcalloutitem::
-   :description: Learn Lightning models in small bites at 4 levels of expertise: basic, intermediate, advanced and expert.
-   :header: Level Up Model Skills!
+   :description: Learn Lightning in small bites at 4 levels of expertise: basic, intermediate, advanced and expert.
+   :header: Level Up!
    :button_link:  expertise_levels.html
-
-.. customcalloutitem::
-   :description: Learn Lightning Apps in small bites at 3 levels of expertise: basic, intermediate, and advanced.
-   :header: Level Up App Skills!
-   :button_link:  https://lightning.ai/lightning-docs/levels/basic/
 
 .. customcalloutitem::
    :description: Detailed description of API each package. Assumes you already have basic Lightning knowledge.
@@ -151,12 +164,6 @@ Current Lightning Users
    :header: Common Workflows
    :button_link: common_usecases.html
 
-.. customcalloutitem::
-   :description: Convert your current code to Lightning
-   :header: Convert code to PyTorch Lightning
-   :button_link: starter/converting.html
-
-
 .. raw:: html
 
         </div>
@@ -166,15 +173,51 @@ Current Lightning Users
 
 .. raw:: html
 
+   <hr class="docutils" style="margin: 50px 0 50px 0">
+
+Migrate To Lightning
+--------------------
+
+.. raw:: html
+
+    <div class="tutorials-callout-container">
+        <div class="row">
+
+.. Add callout items below this line
+
+.. customcalloutitem::
+   :header: PyTorch
+   :description: Organize your PyTorch code into Lightning
+   :button_link:  expertise_levels.html
+
+.. customcalloutitem::
+   :description: Organize your workflows with Lightning
+   :header: DAG frameworks
+   :button_link: api_references.html
+
+.. raw:: html
+
+        </div>
+    </div>
+
+.. raw:: html
+
    <div style="display:none">
+
+.. toctree::
+   :maxdepth: 1
+   :name: home
+   :caption: Home
+
+   self
 
 .. toctree::
    :maxdepth: 1
    :name: start
    :caption: Get Started
 
-   starter/introduction
    starter/installation
+   starter/introduction
 
 
 .. toctree::

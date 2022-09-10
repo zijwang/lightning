@@ -1,2 +1,38 @@
-pytorch_lightning>=1.6.5
-lightning_app>=0.5.2
+py
+jinja2==3.0.3
+lightning-cloud==0.5.0
+packaging
+deepdiff >= 5.7.0
+starsessions
+fsspec==2022.01.0
+s3fs==2022.1.0
+croniter
+traitlets
+sphinx>=4.0
+myst-parser>=0.15
+nbsphinx>=0.8.5
+ipython[notebook]
+pandoc>=1.0
+docutils>=0.16
+sphinxcontrib-fulltoc>=1.0
+sphinxcontrib-mockautodoc
+pt-lightning-sphinx-theme @ https://storage.googleapis.com/grid-packages/lightning-ai-sphinx-theme/build-31.3.zip
+sphinx-autodoc-typehints>=1.11
+sphinx-paramlinks>=0.5.1
+sphinx-togglebutton>=0.2
+sphinx-copybutton>=0.3
+jinja2>=3.0.0
+ipython_genutils
+typing-extensions
+jinja2>=3.0.0
+sphinx-autobuild
+numpy>=1.17.2
+torch>=1.9.*
+tqdm>=4.57.0
+PyYAML>=5.4
+fsspec[http]>=2021.05.0, !=2021.06.0
+tensorboard>=2.9.1
+torchmetrics>=0.7.0
+pyDeprecate>=0.3.1
+packaging>=17.0
+typing-extensions>=4.0.0

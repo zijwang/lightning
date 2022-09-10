@@ -3,27 +3,19 @@
 #######################
 Lightning in 15 minutes
 #######################
-**Required background:** None
+**Required background:** Familiarity with Python.
 
 **Goal:** In this guide, we'll walk you through the 7 key steps of a typical Lightning workflow.
 
-PyTorch Lightning is the deep learning framework with "batteries included" for professional AI researchers and machine learning engineers who need maximal flexibility while super-charging performance at scale.
+Lightning is the framework with "batteries included" that enables professional AI researchers, data scientists and machine learning engineers to build PyTorch models, research workflows and production pipelines. Use Lightning if you need maximal flexibility while super-charging performance at scale.
 
 .. join_slack::
    :align: left
    :margin: 20
 
-
-Lightning organizes PyTorch code to remove boilerplate and unlock scalability.
-
-.. raw:: html
-
-    <video width="100%" max-width="800px" controls autoplay muted playsinline
-    src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/pl_docs/pl_docs_animation_final.m4v"></video>
+Lightning organizes PyTorch and ML workflow code to remove boilerplate and unlock:
 
 |
-
-By organizing PyTorch code, lightning enables:
 
 .. raw:: html
 
@@ -34,28 +26,56 @@ By organizing PyTorch code, lightning enables:
 
 .. displayitem::
    :header: Full flexibility
-   :description: Try any ideas using raw PyTorch without the boilerplate.
+   :description: Try any ideas using without the boilerplate.
    :col_css: col-md-3
    :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_full_control.png
    :height: 290
 
 .. displayitem::
-   :description: Decoupled research and engineering code enable reproducibility and better readability.
-   :header: Reproducible + Readable
+   :header: Reproducibility
+   :description: Decoupled research and engineering code enable reproducibility even down to the hardware.
    :col_css: col-md-3
    :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_no_boilerplate.png
    :height: 290
 
 .. displayitem::
-   :description: Use multiple GPUs/TPUs/HPUs etc... without code changes.
-   :header: Simple multi-GPU training
+   :header: Readability
+   :description: Modular code enables readability no matter the project complexity.
+   :col_css: col-md-3
+   :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_no_boilerplate.png
+   :height: 290
+
+.. displayitem::
+   :header: Maintainability
+   :description: The lightning structure modularizes code and decouples it from the cloud/hardware to make it trivial to maintain.
+   :col_css: col-md-3
+   :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_no_boilerplate.png
+   :height: 290
+
+.. displayitem::
+   :header: Collaboration
+   :description: The lightning structure enforces best practices for collaboration.
+   :col_css: col-md-3
+   :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_no_boilerplate.png
+   :height: 290
+
+.. displayitem::
+   :header: Modularity
+   :description: Compose complex models and workflows scalably.
    :col_css: col-md-3
    :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_hardware.png
    :height: 290
 
 .. displayitem::
-   :description: We've done all the testing so you don't have to.
-   :header: Built-in testing
+   :header: Local debugability
+   :description: Debug distributed, multi-cloud code on your laptop.
+   :col_css: col-md-3
+   :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_hardware.png
+   :height: 290
+
+.. displayitem::
+   :header: Tested for scale
+   :description: Tested for the largest scale used across 10,000+ companies and research labs.
    :col_css: col-md-3
    :image_center: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/card_testing.png
    :height: 290
@@ -69,37 +89,44 @@ By organizing PyTorch code, lightning enables:
 
 ----
 
-****************************
-1: Install PyTorch Lightning
-****************************
+********************
+1: Install Lightning
+********************
 .. raw:: html
 
    <div class="row" style='font-size: 16px'>
       <div class='col-md-6'>
 
-For `pip <https://pypi.org/project/pytorch-lightning/>`_ users
+Pip users
 
 .. code-block:: bash
 
-    pip install pytorch-lightning
+    pip install lightning
 
 .. raw:: html
 
       </div>
       <div class='col-md-6'>
 
-For `conda <https://anaconda.org/conda-forge/pytorch-lightning>`_ users
+Conda users
 
 .. code-block:: bash
 
-    conda install pytorch-lightning -c conda-forge
+    conda install lightning -c conda-forge
 
 .. raw:: html
 
       </div>
    </div>
 
-Or read the `advanced install guide <installation.html>`_
+For custom installation use the `advanced install guide <starter/installation.html>`_.
+
+.. note:: pip install pytorch-lightning has been deprecated and will stop being supported on June 2023.
+
+.. raw:: html
+
+   <hr class="docutils" style="margin: 50px 0 50px 0">
+
 
 ----
 

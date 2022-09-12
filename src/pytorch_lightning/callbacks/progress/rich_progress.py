@@ -313,9 +313,6 @@ class RichProgressBar(ProgressBarBase):
     def on_validation_start(self, trainer, pl_module):
         self._init_progress(trainer)
 
-    def on_sanity_check_start(self, trainer, pl_module):
-        self._init_progress(trainer)
-
     def on_sanity_check_end(self, trainer, pl_module):
         if self.progress is not None:
             self.progress.update(self.val_sanity_progress_bar_id, advance=0, visible=False)

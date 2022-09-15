@@ -282,6 +282,16 @@ class AcceleratorConnector:
                 )
 
         if (
+            strategy is not None
+            and strategy not in self._registered_strategies
+            and not isinstance(strategy, Strategy)
+        ):
+            raise ValueError(
+                f"You selected an invalid strategy name: `strategy={strategy!r}`."
+                f" Available names are: {', '.join(self._registered_strategies)}."
+            )
+
+        if (
             accelerator is not None
             and accelerator not in self._accelerator_types
             and accelerator not in ("auto", "gpu")

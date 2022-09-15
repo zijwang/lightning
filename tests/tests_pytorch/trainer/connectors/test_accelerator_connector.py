@@ -358,6 +358,8 @@ def test_exception_invalid_strategy():
         Trainer(strategy="ddp_cpu")
     with pytest.raises(MisconfigurationException, match=r"strategy='tpu_spawn'\)` is not a valid"):
         Trainer(strategy="tpu_spawn")
+    with pytest.raises(ValueError, match=r"You selected an invalid strategy name"):
+        Trainer(strategy="cocofruit")
 
 
 @pytest.mark.parametrize(

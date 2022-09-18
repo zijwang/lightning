@@ -25,6 +25,7 @@ from torchmetrics import Metric
 import pytorch_lightning as pl
 from lightning_lite.utilities.cloud_io import get_filesystem
 from lightning_lite.utilities.types import _PATH
+from pytorch_lightning.accelerators import CUDAAccelerator
 from pytorch_lightning.plugins.precision import ApexMixedPrecisionPlugin, NativeMixedPrecisionPlugin
 from pytorch_lightning.trainer.states import TrainerFn
 from pytorch_lightning.utilities import _OMEGACONF_AVAILABLE
@@ -113,7 +114,8 @@ class CheckpointConnector:
         self._loaded_checkpoint = {}
 
         # clear cache after restore
-        torch.cuda.empty_cache()
+        if isinstance(self.trainer.accelerator, CUDAAccelerator):
+            torch.cuda.empty_cache()
 
         # wait for all to catch up
         self.trainer.strategy.barrier("CheckpointConnector.resume_end")

@@ -89,7 +89,8 @@ def garbage_collection_cuda() -> None:
     gc.collect()
     try:
         # This is the last thing that should cause an OOM error, but seemingly it can.
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
+        pass
     except RuntimeError as exception:
         if not is_oom_error(exception):
             # Only handle OOM errors

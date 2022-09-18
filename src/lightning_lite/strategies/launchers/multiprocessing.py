@@ -186,7 +186,7 @@ def _check_bad_cuda_fork() -> None:
     The error message replaces PyTorch's 'Cannot re-initialize CUDA in forked subprocess' with helpful advice for
     Lightning users.
     """
-    if not torch.cuda.is_initialized():
+    if not torch.cuda._initialized:
         return
 
     message = (

@@ -40,6 +40,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added an option to configure the signal SLURM sends when a job is preempted or requeued ([#14610](https://github.com/Lightning-AI/lightning/issues/14610))
 
 
+- Added a friendlier error message when attempting to fork processes with pre-initialized CUDA context ([#14709](https://github.com/Lightning-AI/lightning/issues/14709))
+
+
+
 ### Changed
 
 - The `Trainer.{fit,validate,test,predict,tune}` methods now raise a useful error message if the input is not a `LightningModule` ([#13892](https://github.com/Lightning-AI/lightning/pull/13892))

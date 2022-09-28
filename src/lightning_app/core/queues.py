@@ -4,7 +4,7 @@ import queue
 import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, ByteString
 
 from lightning_app.core.constants import (
     REDIS_HOST,
@@ -284,23 +284,63 @@ class RedisQueue(BaseQueue):
                 "If the issue persists, please contact support@lightning.ai"
             )
 
-
+import logging
 class StreamingRedisQueue(RedisQueue):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, group=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.group = group
+
+        if self.group:
+            try:
+                self.redis.xgroup_create(name=self.name, groupname=self.group)
+            except redis.exceptions.ResponseError as e:
+                logging.info(
+                    f"Consumer group exists: {e}"
+                )
 
     def put(self, data):
 
         self.redis.xadd(name=self.name, fields=data)
 
-    def get(self, count=1, message_only=True):
+    def get(self, count=1, key: Optional[ByteString]=None, range: Optional[tuple]=None, consumer_name=None, retrieval_type="since_last"):
+        """
+        Supported access modes.  By range,
+        """
 
-        resp = self.redis.xread(streams={self.name: 0}, count=count)
+        RETRIEVAL_TYPES = {
+            "all": 0,
+            "since_last": ">",
+        }
 
-        if message_only:
+        assert retrieval_type in RETRIEVAL_TYPES
+
+        if self.group:
+            resp = self.redis.xreadgroup(
+                groupname=self.group, consumername=consumer_name, streams={self.name: RETRIEVAL_TYPES[retrieval_type]}, count=count
+            )
+        else:
+            print("No group")
+            resp = self.redis.xread(streams={self.name: 0}, count=count)
+
+        if key:
             _, messages = resp[0]
-            message = messages[0][1].get(b"message")
+            message = messages[0][1].get(key)
             return message
         else:
             return resp
+
+    def acknowledge(self, ids):
+        print(ids)
+        self.redis.xack(self.name, self.group, *ids)
+
+    def length(self) -> int:
+        # Make this into a decorator
+        try:
+            return self.redis.xlen(self.name)
+        except redis.exceptions.ConnectionError:
+            raise ConnectionError()
+
+
+    def pending(self):
+        return self.redis.xpending(name=self.name, groupname=self.group)

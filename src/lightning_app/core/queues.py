@@ -213,6 +213,7 @@ class RedisQueue(BaseQueue):
         self.default_timeout = default_timeout
         self.redis = redis.Redis(host=host, port=port, password=password)
 
+
     def ping(self):
         """Ping the redis server to see if it is alive."""
         try:
@@ -282,3 +283,24 @@ class RedisQueue(BaseQueue):
                 "Please try running your app again. "
                 "If the issue persists, please contact support@lightning.ai"
             )
+
+
+class StreamingRedisQueue(RedisQueue):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def put(self, data):
+
+        self.redis.xadd(name=self.name, fields=data)
+
+    def get(self, count=1, message_only=True):
+
+        resp = self.redis.xread(streams={self.name: 0}, count=count)
+
+        if message_only:
+            _, messages = resp[0]
+            message = messages[0][1].get(b"message")
+            return message
+        else:
+            return resp

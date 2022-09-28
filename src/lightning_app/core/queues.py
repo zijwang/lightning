@@ -284,8 +284,12 @@ class RedisQueue(BaseQueue):
                 "If the issue persists, please contact support@lightning.ai"
             )
 
-import logging
 class StreamingRedisQueue(RedisQueue):
+
+    RETRIEVAL_TYPES = {
+        "all": 0,
+        "since_last": ">",
+    }
 
     def __init__(self, group=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -308,19 +312,16 @@ class StreamingRedisQueue(RedisQueue):
         Supported access modes.  By range,
         """
 
-        RETRIEVAL_TYPES = {
-            "all": 0,
-            "since_last": ">",
-        }
-
-        assert retrieval_type in RETRIEVAL_TYPES
+        assert retrieval_type in self.RETRIEVAL_TYPES
 
         if self.group:
             resp = self.redis.xreadgroup(
-                groupname=self.group, consumername=consumer_name, streams={self.name: RETRIEVAL_TYPES[retrieval_type]}, count=count
+                groupname=self.group,
+                consumername=consumer_name,
+                streams={self.name: self.RETRIEVAL_TYPES[retrieval_type]},
+                count=count,
             )
         else:
-            print("No group")
             resp = self.redis.xread(streams={self.name: 0}, count=count)
 
         if key:
@@ -331,7 +332,6 @@ class StreamingRedisQueue(RedisQueue):
             return resp
 
     def acknowledge(self, ids):
-        print(ids)
         self.redis.xack(self.name, self.group, *ids)
 
     def length(self) -> int:
@@ -340,7 +340,6 @@ class StreamingRedisQueue(RedisQueue):
             return self.redis.xlen(self.name)
         except redis.exceptions.ConnectionError:
             raise ConnectionError()
-
 
     def pending(self):
         return self.redis.xpending(name=self.name, groupname=self.group)

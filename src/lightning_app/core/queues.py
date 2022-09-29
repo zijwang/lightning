@@ -299,7 +299,7 @@ class StreamingRedisQueue(RedisQueue):
             try:
                 self.redis.xgroup_create(name=self.name, groupname=self.group)
             except redis.exceptions.ResponseError as e:
-                logging.info(
+                warnings.warn(
                     f"Consumer group exists: {e}"
                 )
 

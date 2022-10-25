@@ -6,12 +6,6 @@ on:
     branches: [master, "release/*"]
   pull_request:
     branches: [master, "release/*"]
-    paths:
-      - ".actions/**"
-      - ".github/workflows/ci-pkg-install.yml"
-      - "setup.py"
-      - "src/**"
-      - "requirements/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref }}
@@ -32,16 +26,17 @@ jobs:
         name: ci-packages-${{ github.sha }}
         path: pypi
 
-  install-pkg:
+  install-standalone:
     needs: init-temp
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       max-parallel: 1
       matrix:
-        os: [ubuntu-22.04, macOS-12, windows-2022]
+        os: [ubuntu-20.04, ubuntu-22.04, macOS-11, macOS-12, windows-2022]
         pkg: ["app", "lite", "pytorch"]
-        python-version: ["3.7" , "3.10"]
+        python-version: [3.8]  # , 3.9
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -74,7 +69,7 @@ jobs:
       - uses: ./.github/actions/pkg-install
 
   install-meta-src:
-    needs: install-pkg
+    needs: install-standalone
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

@@ -17,6 +17,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref }}
   cancel-in-progress: ${{ ! (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
 
+env:
+  FREEZE_REQUIREMENTS: "1"
+
 defaults:
   run:
     shell: bash
@@ -26,11 +29,11 @@ jobs:
   init-pypi:
     runs-on: ubuntu-20.04
     steps:
-    - run: mkdir pypi && touch pypi/.placeholder
+    - run: mkdir dist && touch dist/.placeholder
     - uses: actions/upload-artifact@v3
       with:
         name: ci-packages-${{ github.sha }}
-        path: pypi
+        path: dist
 
   build-pypi:
     needs: init-pypi
@@ -49,17 +52,15 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: ci-packages-${{ github.sha }}
-          path: pypi
+          path: dist
       - name: Build package
         env:
           PACKAGE_NAME: ${{ matrix.pkg }}
-        run: |
-          python setup.py sdist
-          cp dist/* pypi/
+        run: python setup.py sdist
       - uses: actions/upload-artifact@v3
         with:
           name: ci-packages-${{ github.sha }}
-          path: pypi
+          path: dist
 
   install-pkg:
     needs: build-pypi

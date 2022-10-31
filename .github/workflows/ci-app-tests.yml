@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 env:
-  FREEZE_REQUIREMENTS: 1
+  FREEZE_REQUIREMENTS: "1"
 
 defaults:
   run:

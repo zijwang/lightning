@@ -27,3 +27,6 @@ class CloudBackend(Backend):
 
     def stop_work(self, app: "lightning_app.LightningApp", work: "lightning_app.LightningWork") -> None:
         raise NotImplementedError
+
+    def delete_work(self, app: "lightning_app.LightningApp", work: "lightning_app.LightningWork") -> None:
+        raise NotImplementedError

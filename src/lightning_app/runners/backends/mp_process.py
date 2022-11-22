@@ -83,3 +83,7 @@ class MultiProcessingBackend(Backend):
     def stop_work(self, app, work: "lightning_app.LightningWork") -> None:
         work_manager: MultiProcessWorkManager = app.processes[work.name]
         work_manager.kill()
+
+    def delete_work(self, app, work: "lightning_app.LightningWork") -> None:
+        work_manager: MultiProcessWorkManager = app.processes[work.name]
+        work_manager.kill()

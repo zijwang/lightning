@@ -37,6 +37,9 @@ class Backend(ABC):
     def stop_work(self, app: "lightning_app.LightningApp", work: "lightning_app.LightningWork") -> None:
         pass
 
+    def delete_work(self, app: "lightning_app.LightningApp", work: "lightning_app.LightningWork") -> None:
+        pass
+
     def _dynamic_run_wrapper(
         self,
         *args: Any,
@@ -54,6 +57,8 @@ class Backend(ABC):
 
         # 1. Create and register the queues associated the work
         self._register_queues(app, work)
+
+        print(work.__module__)
 
         work.run = work_run
 

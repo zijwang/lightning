@@ -180,8 +180,9 @@ class LightningLite(ABC):
 
         module = _LiteModule(module, self._precision, original_module=original_module)
 
-        # Update the _DeviceDtypeModuleMixin's device parameter
-        module.to(self.device if move_to_device else next(module.parameters()).device)
+        if not isinstance(self._strategy, FSDPStrategy):
+            # Update the _DeviceDtypeModuleMixin's device parameter
+            module.to(self.device if move_to_device else next(module.parameters()).device)
 
         optimizers = [_LiteOptimizer(optimizer=optimizer, strategy=self._strategy) for optimizer in optimizers]
 

@@ -49,6 +49,7 @@ from lightning_lite.utilities.data import (
     has_iterable_dataset,
 )
 from lightning_lite.utilities.distributed import DistributedSamplerWrapper
+from lightning_lite.utilities.imports import _TORCH_GREATER_EQUAL_1_14
 from lightning_lite.utilities.seed import seed_everything
 from lightning_lite.utilities.warnings import PossibleUserWarning
 from lightning_lite.wrappers import _LiteDataLoader, _LiteModule, _LiteOptimizer
@@ -602,7 +603,7 @@ class LightningLite:
         if any(isinstance(opt, _LiteOptimizer) for opt in optimizers):
             raise ValueError("An optimizer should be passed only once to the `setup` method.")
 
-        if isinstance(self._strategy, FSDPStrategy):
+        if isinstance(self._strategy, FSDPStrategy) and not _TORCH_GREATER_EQUAL_1_14:
             raise RuntimeError(
                 f"The `{type(self).__name__}` requires the model and optimizer(s) to be set up separately."
                 " Create and set up the model first through `model = self.setup_model(model)`. Then create the"

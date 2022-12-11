@@ -88,6 +88,7 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
     Note:
         For torch >= 1.14, we set `FSDP(use_orig_params=True, ...)` to enable multiple parameter groups in the
         optimizer and to give the user more flexibility in creating the optimizer before wrapping the model.
+        The default of this flag may change in the future.
     """
 
     def __init__(

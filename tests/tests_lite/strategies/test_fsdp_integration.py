@@ -75,8 +75,8 @@ def _assert_save_equality(lite, model, ckpt_path):
         assert torch.allclose(current_param.float().cpu(), loaded_param.cpu())
 
 
-def _custom_auto_wrap_policy(module, recurse, unwrapped_params: int, min_num_params: int = int(1e8)) -> bool:
-    return unwrapped_params >= 2
+def _custom_auto_wrap_policy(module, recurse, nonwrapped_numel: int, min_num_params: int = int(1e8)) -> bool:
+    return nonwrapped_numel >= 2
 
 
 @RunIf(min_cuda_gpus=1, skip_windows=True, standalone=True, min_torch="1.12")

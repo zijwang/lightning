@@ -36,7 +36,7 @@ from lightning_lite.utilities.distributed import (
 )
 from lightning_lite.utilities.distributed import group as _group
 from lightning_lite.utilities.distributed import ReduceOp
-from lightning_lite.utilities.imports import _TORCH_GREATER_EQUAL_1_12, _TORCH_GREATER_EQUAL_1_13
+from lightning_lite.utilities.imports import _TORCH_GREATER_EQUAL_1_12, _TORCH_GREATER_EQUAL_1_13, _TORCH_GREATER_EQUAL_1_14
 from lightning_lite.utilities.rank_zero import rank_zero_only
 from lightning_lite.utilities.seed import reset_seed
 
@@ -84,6 +84,10 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
             these layers need to be recomputed during backpropagation.
         \**kwargs: Optional keywoard arguments passed to the FSDP context manager which will configure the FSDP class
             when wrapping modules.
+
+    Note:
+        For torch >= 1.14, we set `FSDP(use_orig_params=True, ...)` to enable multiple parameter groups in the
+        optimizer and to give the user more flexibility in creating the optimizer before wrapping the model.
     """
 
     def __init__(
@@ -116,6 +120,11 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         self._timeout: Optional[timedelta] = timeout
         self._backward_sync_control = _FSDPBackwardSyncControl()
         self._ddp_kwargs = kwargs
+
+        if _TORCH_GREATER_EQUAL_1_14:
+            # The `use_orig_params` allows us to wrap the model before the optimizer gets created.
+            # It also enables the user to use multiple parameter groups in the optimizer.
+            self._ddp_kwargs.setdefault("use_orig_params", True)
 
         if activation_checkpointing and not _TORCH_GREATER_EQUAL_1_13:
             raise ValueError("Activation checkpointing requires torch >= 1.13.0. HINT: `pip install -U torch`")
@@ -176,11 +185,15 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
     def setup_module_and_optimizers(
         self, module: Module, optimizers: List[Optimizer]
     ) -> Tuple[Module, List[Optimizer]]:
-        raise NotImplementedError(
-            f"The `{type(self).__name__}` does not support the joint setup of module and optimizer(s)."
-            " Please do it in this order: Create the model, call `setup_module`, create the optimizer,"
-            " call `setup_optimizer`."
-        )
+        if not _TORCH_GREATER_EQUAL_1_14:
+            raise NotImplementedError(
+                f"The `{type(self).__name__}` does not support the joint setup of module and optimizer(s)."
+                " Please do it in this order: Create the model, call `setup_module`, create the optimizer,"
+                " call `setup_optimizer`."
+            )
+        wrapped_module = self.setup_module(module)
+        optimizers = [self.setup_optimizer(optimizer) for optimizer in optimizers]
+        return wrapped_module, optimizers
 
     def setup_module(self, module: Module) -> "FullyShardedDataParallel":
         """Wraps the model into a
@@ -192,6 +205,7 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         ):
             # If model is already wrapped, we need to avoid sending the `auto_wrap_policy`
             del self._ddp_kwargs["auto_wrap_policy"]
+
         wrapped_module = FullyShardedDataParallel(
             module=module,
             cpu_offload=self.cpu_offload,
@@ -219,8 +233,8 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         num_groups = len(optimizer.param_groups)
         if num_groups > 1:
             raise ValueError(
-                "An optimizer used with an FSDP model does not support multiple param groups."
-                f" Found {num_groups} parameter groups."
+                "An optimizer with multiple param groups in FSDP is only supported in torch >= 1.14."
+                f" Found {num_groups} parameter groups. "
             )
 
         if any(isinstance(param, FlatParameter) for param in optimizer.param_groups[0]["params"]):

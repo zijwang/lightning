@@ -97,13 +97,15 @@ def test_fsdp_train_save_load(manual_wrapping, precision):
     dataloader = DataLoader(RandomDataset(32, 64))
 
     # model needs to be set up first in FSDP
-    model = lite.setup_module(model)
+    # model = lite.setup_module(model)
 
     # get parameters on the wrapped model
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
     # optimizer nees to be set up independently
-    optimizer = lite.setup_optimizers(optimizer)
+    # optimizer = lite.setup_optimizers(optimizer)
+
+    model, optimizer = lite.setup(model, optimizer)
 
     dataloader = lite.setup_dataloaders(dataloader)
     model.train()

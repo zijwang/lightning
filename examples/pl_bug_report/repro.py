@@ -6,8 +6,8 @@ from lightning_lite.strategies import FSDPStrategy
 from pytorch_lightning.demos.boring_classes import RandomDataset
 
 
-def _custom_auto_wrap_policy(module, recurse, unwrapped_params: int, min_num_params: int = int(1e8)) -> bool:
-    return unwrapped_params >= 2
+def _custom_auto_wrap_policy(module, recurse, nonwrapped_numel: int, min_num_params: int = int(1e8)) -> bool:
+    return nonwrapped_numel >= 2
 
 
 def main():

@@ -21,7 +21,13 @@ from lightning_app.model2cloud.save import (
     _write_and_save_requirements,
     get_linked_output_dir,
 )
-from lightning_app.model2cloud.utils import get_model_data, LIGHTNING_CLOUD_URL, LIGHTNING_STORAGE_FILE, split_name, stage
+from lightning_app.model2cloud.utils import (
+    get_model_data,
+    LIGHTNING_CLOUD_URL,
+    LIGHTNING_STORAGE_FILE,
+    split_name,
+    stage,
+)
 
 if os.getenv("LIGHTNING_MODEL_STORE_TESTING", 0):
     from tests.constants import LIGHTNING_TEST_STORAGE_DIR as LIGHTNING_STORAGE_DIR

@@ -2,11 +2,10 @@ import os
 import platform
 
 import pytest
-
-from lightning_app.model2cloud.cloud_api import to_lightning_cloud, download_from_lightning_cloud
-from pytorch_lightning.demos.boring_classes import BoringModel
-
 from tests_app.model2cloud.utils import cleanup
+
+from lightning_app.model2cloud.cloud_api import download_from_lightning_cloud, to_lightning_cloud
+from pytorch_lightning.demos.boring_classes import BoringModel
 
 if os.getenv("LIGHTNING_MODEL_STORE_TESTING"):
     from tests_app.model2cloud.constants import LIGHTNING_TEST_STORAGE_DIR as LIGHTNING_STORAGE_DIR

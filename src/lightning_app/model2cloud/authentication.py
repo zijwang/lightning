@@ -2,9 +2,9 @@ import json
 import webbrowser
 
 import requests
-from lightning.app.utilities.network import LightningClient
 from requests.models import HTTPBasicAuth
 
+from lightning.app.utilities.network import LightningClient
 from lightning_app.model2cloud.utils import LIGHTNING_CLOUD_URL
 
 

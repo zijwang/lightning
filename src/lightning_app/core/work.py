@@ -124,13 +124,23 @@ class LightningWork:
                 " in the next version. Use `cache_calls` instead."
             )
         self._cache_calls = run_once if run_once is not None else cache_calls
-        self._state = {"_host", "_port", "_url", "_future_url", "_internal_ip", "_restarting", "_cloud_compute"}
+        self._state = {
+            "_host",
+            "_port",
+            "_url",
+            "_future_url",
+            "_internal_ip",
+            "_restarting",
+            "_cloud_compute",
+            "_short_name",
+        }
         self._parallel = parallel
         self._host: str = host
         self._port: Optional[int] = port
         self._url: str = ""
         self._future_url: str = ""  # The cache URL is meant to defer resolving the url values.
         self._internal_ip: str = ""
+        self._short_name: str = ""
         # setattr_replacement is used by the multiprocessing runtime to send the latest changes to the main coordinator
         self._setattr_replacement: Optional[Callable[[str, Any], None]] = None
         self._name = ""
@@ -211,6 +221,11 @@ class LightningWork:
     def name(self):
         """Returns the name of the LightningWork."""
         return self._name
+
+    @property
+    def short_name(self):
+        """Returns the short name of the LightningWork."""
+        return self._short_name
 
     @property
     def cache_calls(self) -> bool:

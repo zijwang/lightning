@@ -78,12 +78,37 @@ class CUDAAccelerator(Accelerator):
         )
 
 
-def _get_all_available_cuda_gpus() -> List[int]:
-    """
-    Returns:
-         A list of all available CUDA GPUs
+def _get_all_visible_cuda_gpus() -> List[int]:
+    """Returns a list of all visible CUDA GPUs.
+
+    GPUs masked by the environment variabale ``CUDA_VISIBLE_DEVICES`` won't be returned here.
+    For example, assume you have 8 physical GPUs. If ``CUDA_VISIBLE_DEVICES="1,3,6"``, then this function
+    will return the list ``[0, 1, 2]`` because these are the three visible GPUs after applying the mask
+    ``CUDA_VISIBLE_DEVICES``.
     """
     return list(range(num_cuda_devices()))
+
+
+def _get_all_available_cuda_gpus() -> List[int]:
+    """Returns a list of all available and usable CUDA GPUs.
+
+    This function only returns GPUs that are visible AND on which the current process is allowed to allocate memory.
+    If the GPU is in 'exclusive' mode, only one process can occupy it at a given time. If a GPU is in exclusive mode
+    and occupied, it won't be included in the returned list here.
+
+    Note:
+        If multiple processes call this function at the same time, there can be race conditions in the case where
+        both processes determine that the device is unoccupied, leading into one of them crashing later on.
+    """
+    visible_gpus = _get_all_visible_cuda_gpus()
+    available_gpus = []
+    for gpu_idx in visible_gpus:
+        try:
+            torch.tensor(1).to("cuda", gpu_idx)
+        except RuntimeError:
+            continue
+        available_gpus.append(gpu_idx)
+    return available_gpus
 
 
 # TODO: Remove once minimum supported PyTorch version is 2.0

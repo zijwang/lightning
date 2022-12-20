@@ -104,7 +104,7 @@ def _get_all_available_cuda_gpus() -> List[int]:
     available_gpus = []
     for gpu_idx in visible_gpus:
         try:
-            torch.tensor(1).to("cuda", gpu_idx)
+            torch.tensor(1, device=torch.device("cuda", gpu_idx))
         except RuntimeError:
             continue
         available_gpus.append(gpu_idx)

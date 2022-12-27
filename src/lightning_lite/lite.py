@@ -307,21 +307,23 @@ class LightningLite:
             *objects:
             move_to_cpu:
         """
-        final_objects = []
+        processed = []
         for obj in objects:
             if isinstance(obj, _LiteModule):
                 obj = obj.cpu() if move_to_cpu else obj
-                final_objects.append(obj.module)
+                module = self._strategy.teardown_module(obj.module)
+                processed.append(module)
+                self._models_setup -= 1
             elif isinstance(obj, _LiteOptimizer):
-                final_objects.append(obj.optimizer)
+                processed.append(obj.optimizer)
             elif isinstance(obj, _LiteDataLoader):
-                final_objects.append(obj._dataloader)
+                processed.append(obj._dataloader)
             else:
-                final_objects.append(obj)
+                processed.append(obj)
 
         self._strategy.teardown()
 
-        return final_objects[0] if len(final_objects) == 1 else final_objects
+        return processed[0] if len(processed) == 1 else processed
 
     def backward(self, tensor: Tensor, *args: Any, model: Optional[_LiteModule] = None, **kwargs: Any) -> None:
         """Replaces ``loss.backward()`` in your training loop. Handles precision and automatically for you.

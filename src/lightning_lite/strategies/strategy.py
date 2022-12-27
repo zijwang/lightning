@@ -274,8 +274,20 @@ class Strategy(ABC):
         if self.is_global_zero:
             self.checkpoint_io.remove_checkpoint(filepath)
 
+    def teardown_module(self, module: Module) -> Module:
+        """Undo any transformations applied to the module during :meth:`setup_module` or
+        :meth:`setup_module_and_optimizers`.
+
+        An example could be undoing a wrapper, or patched methods. Note that it should not be the responsibility of
+        this method to move the module back to CPU.
+        This method should be called before the general :meth:`teardown` of the strategy itself.
+
+        Args:
+            module: The module to process.
+        """
+
     def teardown(self) -> None:
-        """This method is called to teardown the training process.
+        """General teardown of the strategy.
 
         It is the right place to release memory and free other resources.
         """

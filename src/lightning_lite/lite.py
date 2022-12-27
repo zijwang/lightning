@@ -53,6 +53,7 @@ from lightning_lite.utilities.seed import seed_everything
 from lightning_lite.utilities.warnings import PossibleUserWarning
 from lightning_lite.wrappers import _LiteDataLoader, _LiteModule, _LiteOptimizer
 
+_LITE_WRAPPERS = Union[_LiteModule, _LiteOptimizer, _LiteDataLoader]
 
 class LightningLite:
     """Lite accelerates your PyTorch training or inference code with minimal changes required.
@@ -298,6 +299,29 @@ class LightningLite:
         lite_dataloader = _LiteDataLoader(dataloader=dataloader, device=device)
         lite_dataloader = cast(DataLoader, lite_dataloader)
         return lite_dataloader
+
+    def teardown(self, *objects: _LITE_WRAPPERS, move_to_cpu: bool = True) -> Union[nn.Module, Optimizer, DataLoader, List[Union[nn.Module, Optimizer, DataLoader]]]:
+        """Opposite of :meth:`setup`.
+
+        Args:
+            *objects:
+            move_to_cpu:
+        """
+        final_objects = []
+        for obj in objects:
+            if isinstance(obj, _LiteModule):
+                obj = obj.cpu() if move_to_cpu else obj
+                final_objects.append(obj.module)
+            elif isinstance(obj, _LiteOptimizer):
+                final_objects.append(obj.optimizer)
+            elif isinstance(obj, _LiteDataLoader):
+                final_objects.append(obj._dataloader)
+            else:
+                final_objects.append(obj)
+
+        self._strategy.teardown()
+
+        return final_objects[0] if len(final_objects) == 1 else final_objects
 
     def backward(self, tensor: Tensor, *args: Any, model: Optional[_LiteModule] = None, **kwargs: Any) -> None:
         """Replaces ``loss.backward()`` in your training loop. Handles precision and automatically for you.

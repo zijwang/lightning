@@ -29,7 +29,6 @@ from argparse import _ArgumentGroup, ArgumentParser, Namespace
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import timedelta
-from pathlib import Path
 from typing import Any, Dict, Generator, Iterable, List, Optional, Type, Union
 from weakref import proxy
 
@@ -121,7 +120,6 @@ class Trainer:
         gradient_clip_algorithm: Optional[str] = None,
         num_nodes: int = 1,
         devices: Optional[Union[List[int], str, int]] = None,
-        auto_select_gpus: Optional[bool] = None,  # TODO: Remove in 2.0
         enable_progress_bar: bool = True,
         overfit_batches: Union[int, float] = 0.0,
         track_grad_norm: Union[int, float, str] = -1,
@@ -145,7 +143,6 @@ class Trainer:
         precision: Union[int, str] = 32,
         enable_model_summary: bool = True,
         num_sanity_val_steps: int = 2,
-        resume_from_checkpoint: Optional[Union[Path, str]] = None,
         profiler: Optional[Union[Profiler, str]] = None,
         benchmark: Optional[bool] = None,
         deterministic: Optional[Union[bool, _LITERAL_WARN]] = None,
@@ -183,16 +180,6 @@ class Trainer:
                 Additionally, can be set to either `power` that estimates the batch size through
                 a power search or `binsearch` that estimates the batch size through a binary search.
                 Default: ``False``.
-
-            auto_select_gpus: If enabled and ``gpus`` or ``devices`` is an integer, pick available
-                gpus automatically. This is especially useful when
-                GPUs are configured to be in "exclusive mode", such
-                that only one process at a time can access them.
-                Default: ``False``.
-
-                .. deprecated:: v1.9
-                    ``auto_select_gpus`` has been deprecated in v1.9.0 and will be removed in v1.10.0.
-                    Please use the function :func:`~lightning_lite.accelerators.cuda.find_usable_cuda_devices` instead.
 
             benchmark: The value (``True`` or ``False``) to set ``torch.backends.cudnn.benchmark`` to.
                 The value for ``torch.backends.cudnn.benchmark`` set in the current session will be used
@@ -310,14 +297,6 @@ class Trainer:
                 train sampler and ``shuffle=False`` for val/test sampler. If you want to customize it,
                 you can set ``replace_sampler_ddp=False`` and add your own distributed sampler.
 
-            resume_from_checkpoint: Path/URL of the checkpoint from which training is resumed. If there is
-                no checkpoint file at the path, an exception is raised. If resuming from mid-epoch checkpoint,
-                training will start from the beginning of the next epoch.
-
-                .. deprecated:: v1.5
-                    ``resume_from_checkpoint`` is deprecated in v1.5 and will be removed in v2.0.
-                    Please pass the path to ``Trainer.fit(..., ckpt_path=...)`` instead.
-
             strategy: Supports different training strategies with aliases
                 as well custom strategies.
                 Default: ``None``.
@@ -372,13 +351,12 @@ class Trainer:
             benchmark=benchmark,
             replace_sampler_ddp=replace_sampler_ddp,
             deterministic=deterministic,
-            auto_select_gpus=auto_select_gpus,
             precision=precision,
             plugins=plugins,
         )
         self._logger_connector = LoggerConnector(self)
         self._callback_connector = CallbackConnector(self)
-        self._checkpoint_connector = CheckpointConnector(self, resume_from_checkpoint)
+        self._checkpoint_connector = CheckpointConnector(self)
         self._signal_connector = SignalConnector(self)
         self.tuner = Tuner(self)
 
@@ -580,11 +558,10 @@ class Trainer:
             model, train_dataloaders=train_dataloaders, val_dataloaders=val_dataloaders, datamodule=datamodule
         )
 
-        # TODO: ckpt_path only in v2.0
-        ckpt_path = ckpt_path or self.resume_from_checkpoint
+        ckpt_path = ckpt_path
         self._ckpt_path = self._checkpoint_connector._set_ckpt_path(
             self.state.fn,
-            ckpt_path,  # type: ignore[arg-type]
+            ckpt_path,
             model_provided=True,
             model_connected=self.lightning_module is not None,
         )
@@ -1816,18 +1793,6 @@ class Trainer:
             if isinstance(c, ProgressBarBase):
                 return c
         return None
-
-    @property
-    def resume_from_checkpoint(self) -> Optional[Union[str, Path]]:
-        resume_from_checkpoint = self._checkpoint_connector.resume_from_checkpoint_fit_path
-        if resume_from_checkpoint is not None:
-            rank_zero_deprecation(
-                "`trainer.resume_from_checkpoint` is deprecated in v1.5 and will be removed in v2.0."
-                " Specify the fit checkpoint path with `trainer.fit(ckpt_path=)` instead.",
-                stacklevel=5,
-            )
-
-        return resume_from_checkpoint
 
     @property
     def ckpt_path(self) -> Optional[str]:

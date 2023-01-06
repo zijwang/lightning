@@ -43,8 +43,8 @@ class DummyDataset(Dataset):
     def __len__(self):
         return 10
 
+if __name__ == "__main__":
+    dataset = DummyDataset()
 
-dataset = DummyDataset()
-
-trainer = pl.Trainer(logger=None, accelerator='gpu')
-trainer.fit(LitAutoEncoder(), DataLoader(dataset, num_workers=2))
+    trainer = pl.Trainer(logger=None, accelerator='gpu')
+    trainer.fit(LitAutoEncoder(), DataLoader(dataset, num_workers=2))

@@ -104,6 +104,9 @@ def main(
     optimizer = torch.optim.Adam(maml.parameters(), meta_lr)
     optimizer = cherry.optim.Distributed(maml.parameters(), opt=optimizer, sync=1)
     optimizer.sync_parameters()
+
+    print("mem3", torch.cuda.memory_allocated())
+
     loss = torch.nn.CrossEntropyLoss(reduction="mean")
 
     for iteration in range(num_iterations):

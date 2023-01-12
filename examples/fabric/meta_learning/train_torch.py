@@ -105,7 +105,8 @@ def main(
     optimizer = cherry.optim.Distributed(maml.parameters(), opt=optimizer, sync=1)
     optimizer.sync_parameters()
 
-    print("mem3", torch.cuda.memory_allocated())
+    print("mem3", torch.cuda.memory_allocated())  # torch: 992768
+    print("metabs", meta_batch_size)
 
     loss = torch.nn.CrossEntropyLoss(reduction="mean")
 
@@ -118,7 +119,9 @@ def main(
         for task in range(meta_batch_size):
             # Compute meta-training loss
             learner = maml.clone()
+            print("mem4", torch.cuda.memory_allocated())
             batch = tasksets.train.sample()
+            print("mem5", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 batch,
                 learner,
@@ -129,12 +132,15 @@ def main(
                 device,
             )
             evaluation_error.backward()
+            print("mem6", torch.cuda.memory_allocated())
             meta_train_error += evaluation_error.item()
             meta_train_accuracy += evaluation_accuracy.item()
 
             # Compute meta-validation loss
             learner = maml.clone()
+            print("mem7", torch.cuda.memory_allocated())
             batch = tasksets.validation.sample()
+            print("mem8", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 batch,
                 learner,
@@ -144,6 +150,7 @@ def main(
                 ways,
                 device,
             )
+            print("mem9", torch.cuda.memory_allocated())
             meta_valid_error += evaluation_error.item()
             meta_valid_accuracy += evaluation_accuracy.item()
 

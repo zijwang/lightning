@@ -27,7 +27,8 @@ def accuracy(predictions, targets):
     return (predictions == targets).sum().float() / targets.size(0)
 
 
-def fast_adapt(batch, learner, loss, adaptation_steps, shots, ways):
+def fast_adapt(fabric, batch, learner, loss, adaptation_steps, shots, ways):
+    batch = fabric.to_device(batch)
     data, labels = batch
 
     # Separate data into adaptation/evalutation sets
@@ -116,9 +117,10 @@ def main(
             # Compute meta-training loss
             learner = maml.clone()
             print("mem4", torch.cuda.memory_allocated())
-            batch = fabric.to_device(tasksets.train.sample())
+            batch = tasksets.train.sample()
             print("mem5", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
+                fabric,
                 batch,
                 learner,
                 loss,
@@ -134,9 +136,10 @@ def main(
             # Compute meta-validation loss
             learner = maml.clone()
             print("mem7", torch.cuda.memory_allocated())
-            batch = fabric.to_device(tasksets.validation.sample())
+            batch = tasksets.validation.sample()
             print("mem8", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
+                fabric,
                 batch,
                 learner,
                 loss,
@@ -144,6 +147,7 @@ def main(
                 shots,
                 ways,
             )
+            print("mem9", torch.cuda.memory_allocated())
             meta_valid_error += evaluation_error.item()
             meta_valid_accuracy += evaluation_accuracy.item()
 
@@ -159,7 +163,7 @@ def main(
         for p in maml.parameters():
             p.grad.data.mul_(1.0 / meta_batch_size)
         optimizer.step()  # averages gradients across all workers
-        print("mem9", torch.cuda.memory_allocated())
+        print("mem10", torch.cuda.memory_allocated())
 
     meta_test_error = 0.0
     meta_test_accuracy = 0.0

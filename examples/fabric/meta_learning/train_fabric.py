@@ -80,7 +80,7 @@ def main(
         root="data",
     )
 
-    print("mem0", torch.cuda.memory_allocated())
+    print("mem0", torch.cuda.memory_reserved())
 
 
     # Create model
@@ -88,20 +88,20 @@ def main(
     model = l2l.vision.models.OmniglotFC(28**2, ways)
     model = fabric.to_device(model)
 
-    print("mem1", torch.cuda.memory_allocated())
+    print("mem1", torch.cuda.memory_reserved())
 
     maml = l2l.algorithms.MAML(model, lr=fast_lr, first_order=False)
     optimizer = torch.optim.Adam(maml.parameters(), meta_lr)
     optimizer = cherry.optim.Distributed(maml.parameters(), opt=optimizer, sync=1)
 
-    print("mem2", torch.cuda.memory_allocated())
+    print("mem2", torch.cuda.memory_reserved())
 
 
     # model, optimizer = fabric.setup(model, optimizer)
 
     optimizer.sync_parameters()
 
-    print("mem3", torch.cuda.memory_allocated())  # torch: 992768
+    print("mem3", torch.cuda.memory_reserved())  # torch: 992768
     print("metabs", meta_batch_size)
 
 
@@ -116,9 +116,9 @@ def main(
         for task in range(meta_batch_size):
             # Compute meta-training loss
             learner = maml.clone()
-            print("mem4", torch.cuda.memory_allocated())  # torch: 1985536,  after first itration: 5789696
+            print("mem4", torch.cuda.memory_reserved())  # torch: 1985536,  after first itration: 5789696
             batch = tasksets.train.sample()
-            print("mem5", torch.cuda.memory_allocated())
+            print("mem5", torch.cuda.memory_reserved())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 fabric,
                 batch,
@@ -129,15 +129,15 @@ def main(
                 ways,
             )
             fabric.backward(evaluation_error)
-            print("mem6", torch.cuda.memory_allocated())
+            print("mem6", torch.cuda.memory_reserved())
             meta_train_error += evaluation_error.item()
             meta_train_accuracy += evaluation_accuracy.item()
 
             # Compute meta-validation loss
             learner = maml.clone()
-            print("mem7", torch.cuda.memory_allocated())
+            print("mem7", torch.cuda.memory_reserved())
             batch = tasksets.validation.sample()
-            print("mem8", torch.cuda.memory_allocated())
+            print("mem8", torch.cuda.memory_reserved())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 fabric,
                 batch,
@@ -147,7 +147,7 @@ def main(
                 shots,
                 ways,
             )
-            print("mem9", torch.cuda.memory_allocated())
+            print("mem9", torch.cuda.memory_reserved())
             meta_valid_error += evaluation_error.item()
             meta_valid_accuracy += evaluation_accuracy.item()
 
@@ -163,7 +163,7 @@ def main(
         for p in maml.parameters():
             p.grad.data.mul_(1.0 / meta_batch_size)
         optimizer.step()  # averages gradients across all workers
-        print("mem10", torch.cuda.memory_allocated())
+        print("mem10", torch.cuda.memory_reserved())
 
     meta_test_error = 0.0
     meta_test_accuracy = 0.0

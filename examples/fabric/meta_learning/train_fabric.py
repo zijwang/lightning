@@ -57,7 +57,7 @@ def main(
     fast_lr=0.5,
     meta_batch_size=32,
     adaptation_steps=1,
-    num_iterations=60000,
+    num_iterations=1,
     seed=42,
 ):
     # Create the Fabric object
@@ -100,7 +100,8 @@ def main(
 
     optimizer.sync_parameters()
 
-    print("mem3", torch.cuda.memory_allocated())
+    print("mem3", torch.cuda.memory_allocated())  # torch: 992768
+    print("metabs", meta_batch_size)
 
 
     loss = torch.nn.CrossEntropyLoss(reduction="mean")

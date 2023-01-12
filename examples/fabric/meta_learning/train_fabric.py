@@ -57,7 +57,7 @@ def main(
     fast_lr=0.5,
     meta_batch_size=32,
     adaptation_steps=1,
-    num_iterations=1,
+    num_iterations=5,
     seed=42,
 ):
     # Create the Fabric object
@@ -115,7 +115,9 @@ def main(
         for task in range(meta_batch_size):
             # Compute meta-training loss
             learner = maml.clone()
+            print("mem4", torch.cuda.memory_allocated())
             batch = fabric.to_device(tasksets.train.sample())
+            print("mem5", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 batch,
                 learner,
@@ -124,13 +126,16 @@ def main(
                 shots,
                 ways,
             )
-            evaluation_error.backward()
+            fabric.backward(evaluation_error)
+            print("mem6", torch.cuda.memory_allocated())
             meta_train_error += evaluation_error.item()
             meta_train_accuracy += evaluation_accuracy.item()
 
             # Compute meta-validation loss
             learner = maml.clone()
+            print("mem7", torch.cuda.memory_allocated())
             batch = fabric.to_device(tasksets.validation.sample())
+            print("mem8", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(
                 batch,
                 learner,
@@ -154,6 +159,7 @@ def main(
         for p in maml.parameters():
             p.grad.data.mul_(1.0 / meta_batch_size)
         optimizer.step()  # averages gradients across all workers
+        print("mem9", torch.cuda.memory_allocated())
 
     meta_test_error = 0.0
     meta_test_accuracy = 0.0

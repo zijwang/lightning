@@ -116,7 +116,7 @@ def main(
         for task in range(meta_batch_size):
             # Compute meta-training loss
             learner = maml.clone()
-            print("mem4", torch.cuda.memory_allocated())
+            print("mem4", torch.cuda.memory_allocated())  # torch: 1985536,  after first itration: 5789696
             batch = tasksets.train.sample()
             print("mem5", torch.cuda.memory_allocated())
             evaluation_error, evaluation_accuracy = fast_adapt(

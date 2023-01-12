@@ -79,7 +79,7 @@ def main(
         root="data",
     )
 
-    print("mem0", torch.cuda.memory_allocated())
+    print("mem0", torch.cuda.memory_allocated() // 1024 // 1024)
 
 
     # Create model
@@ -87,20 +87,20 @@ def main(
     model = l2l.vision.models.OmniglotFC(28**2, ways)
     model = fabric.to_device(model)
 
-    print("mem1", torch.cuda.memory_allocated())
+    print("mem1", torch.cuda.memory_allocated() // 1024 // 1024)
 
     maml = l2l.algorithms.MAML(model, lr=fast_lr, first_order=False)
     optimizer = torch.optim.Adam(maml.parameters(), meta_lr)
     optimizer = cherry.optim.Distributed(maml.parameters(), opt=optimizer, sync=1)
 
-    print("mem2", torch.cuda.memory_allocated())
+    print("mem2", torch.cuda.memory_allocated() // 1024 // 1024)
 
 
     # model, optimizer = fabric.setup(model, optimizer)
 
     optimizer.sync_parameters()
 
-    print("mem3", torch.cuda.memory_allocated())
+    print("mem3", torch.cuda.memory_allocated() // 1024 // 1024)
 
 
     loss = torch.nn.CrossEntropyLoss(reduction="mean")

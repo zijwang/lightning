@@ -14,7 +14,8 @@
 import functools
 from contextlib import contextmanager
 from datetime import timedelta
-from typing import Any, Dict, Generator, List, Optional, Tuple, Type, TYPE_CHECKING, Union
+from pathlib import Path
+from typing import Any, Dict, Generator, List, Optional, Tuple, Type, TYPE_CHECKING, Union, Mapping, Iterable
 
 import torch
 from torch import Tensor
@@ -266,6 +267,33 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
             obj = [None]  # type: ignore[list-item]
         torch.distributed.broadcast_object_list(obj, src, group=_group.WORLD)
         return obj[0]
+
+    def save_checkpoint(
+        self, checkpoint: Dict[str, Any], filepath: _PATH, storage_options: Optional[Any] = None
+    ) -> None:
+        from torch.distributed._shard.checkpoint import FileSystemWriter, save_state_dict, load_state_dict
+
+
+
+    def get_module_state_dict(self, module: Module) -> Dict[str, Union[Any, Tensor]]:
+        from torch.distributed.fsdp import StateDictType, FullyShardedDataParallel
+
+        with FullyShardedDataParallel.state_dict_type(module, StateDictType.LOCAL_STATE_DICT):
+            return module.state_dict()
+
+    def get_optimizer_state(self, optimizer: Optimizer) -> Dict[str, Tensor]:
+        raise NotImplementedError()
+
+    def load_checkpoint(self, checkpoint_path: _PATH) -> Dict[str, Any]:
+        pass
+
+    def load_module_state_dict(self, module: Module, checkpoint: Mapping[str, Any]) -> None:
+        pass
+
+    def load_optimizer_state_dict(
+        self, optimizers: Union[Optimizer, Iterable[Optimizer]], checkpoint: Mapping[str, Any]
+    ) -> None:
+        pass
 
     @classmethod
     def register_strategies(cls, strategy_registry: Dict) -> None:

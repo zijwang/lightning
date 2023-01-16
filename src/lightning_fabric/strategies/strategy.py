@@ -230,7 +230,6 @@ class Strategy(ABC):
 
     def get_module_state_dict(self, module: Module) -> Dict[str, Union[Any, Tensor]]:
         """Returns model state."""
-        # TODO(fabric): Integrate this into Lightning Fabric
         return module.state_dict()
 
     def get_optimizer_state(self, optimizer: Optimizer) -> Dict[str, Tensor]:

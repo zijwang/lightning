@@ -508,7 +508,7 @@ class Fabric:
         else:
             yield
 
-    def save(self, content: Dict[str, Any], filepath: Union[str, Path]) -> None:
+    def save(self, path: Union[str, Path], **kwargs) -> None:
         """Save checkpoint contents to a file.
 
         How and which processes save gets determined by the `strategy`. For example, the `ddp` strategy
@@ -518,7 +518,30 @@ class Fabric:
             content: A dictionary with contents, i.e., the state dict of your model
             filepath: A path to where the file should be saved
         """
-        self._strategy.save_checkpoint(content, filepath)
+        if isinstance(self._strategy, FSDPStrategy):
+            from torch.distributed.fsdp import StateDictType, FullyShardedDataParallel
+            from torch.distributed._shard.checkpoint import FileSystemWriter, save_state_dict, load_state_dict
+
+            destination = Path(path)
+
+            metadata = {}
+            for name, obj in kwargs.items():
+                if isinstance(obj, nn.Module):
+                    with FullyShardedDataParallel.state_dict_type(obj, StateDictType.LOCAL_STATE_DICT):
+                        state_dict = self.strategy.get_module_state_dict(module=obj)
+
+                    # TODO: check that .metadata file not already exists
+                    writer = FileSystemWriter(destination / name)
+                    save_state_dict(state_dict, writer)
+
+                elif isinstance(obj, Optimizer):
+                    obj = self.strategy.get_optimizer_state(optimizer=obj)
+                else:
+                    metadata[name] = obj
+
+            self._strategy.save_checkpoint(metadata, destination / "metadata.ckpt")
+        else:
+            self._strategy.save_checkpoint(kwargs, path)
 
     def load(self, filepath: Union[str, Path]) -> Any:
         """Load a checkpoint from a file.

@@ -27,7 +27,7 @@ def main():
     optimizer.zero_grad()
 
     state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
-    fabric.save("lightning_logs/sharded", state)
+    fabric.save(state, "lightning_logs/sharded")
 
 
 if __name__ == "__main__":

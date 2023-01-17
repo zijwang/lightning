@@ -530,7 +530,6 @@ class Fabric:
                     with FullyShardedDataParallel.state_dict_type(obj, StateDictType.LOCAL_STATE_DICT):
                         state_dict = self.strategy.get_module_state_dict(module=obj)
 
-                    print(state_dict)
                     # TODO: check that .metadata file not already exists
                     writer = FileSystemWriter(destination / name)
                     save_state_dict(state_dict, writer)
@@ -545,15 +544,42 @@ class Fabric:
         else:
             self._strategy.save_checkpoint(state, path)
 
-    def load(self, filepath: Union[str, Path]) -> Any:
+    def load(self, path: Union[str, Path], state: Optional[Dict[str, Union[nn.Module, Optimizer, Any]]]) -> Any:
         """Load a checkpoint from a file.
 
         How and which processes load gets determined by the `strategy`
 
         Args:
-            filepath: A path to where the file is located
+            path: A path to where the file is located
+            state: TODO
         """
-        return self._strategy.load_checkpoint(filepath)
+        if isinstance(self._strategy, FSDPStrategy):
+            from torch.distributed.fsdp import StateDictType, FullyShardedDataParallel
+            from torch.distributed._shard.checkpoint import FileSystemReader, load_state_dict
+
+            source = Path(path)
+
+            metadata = {}
+            for name, obj in state.items():
+                if isinstance(obj, nn.Module):
+                    # TODO: check that .metadata file not already exists
+                    reader = FileSystemReader(source / name)
+                    with FullyShardedDataParallel.state_dict_type(obj, StateDictType.LOCAL_STATE_DICT):
+                        state_dict = self.strategy.get_module_state_dict(module=obj)
+                        load_state_dict(state_dict, reader)
+                        # obj.load_state_dict(state)
+
+                elif isinstance(obj, Optimizer):
+                    pass
+                    # obj = self.strategy.get_optimizer_state(optimizer=obj)
+                else:
+                    metadata[name] = obj
+
+            metadata = self._strategy.load_checkpoint(source / "metadata.ckpt")
+            state.update(metadata)
+            return state
+
+        return self._strategy.load_checkpoint(path)
 
     def launch(self, function: Optional[Callable[["Fabric"], Any]] = None, *args: Any, **kwargs: Any) -> Any:
         if _is_using_cli():

@@ -19,7 +19,6 @@ class BigModel(nn.Module):
         return self.layer(x)
 
 
-
 def main():
     strategy = FSDPStrategy(auto_wrap_policy=_custom_auto_wrap_policy)
     fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
@@ -38,8 +37,8 @@ def main():
     optimizer.step()
     optimizer.zero_grad()
 
-    state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
-    fabric.save(state, "lightning_logs/sharded")
+    state = {"model": model, "optimizer": optimizer, "loss": loss.item()}
+    fabric.save(state, "lightning_logs/sharded_unwrapped")
 
 
 if __name__ == "__main__":

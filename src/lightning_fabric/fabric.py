@@ -535,7 +535,8 @@ class Fabric:
                     save_state_dict(state_dict, writer)
 
                 elif isinstance(obj, Optimizer):
-                    obj = self.strategy.get_optimizer_state(optimizer=obj)
+                    pass
+                    # obj = self.strategy.get_optimizer_state(optimizer=obj)
                 else:
                     metadata[name] = obj
 

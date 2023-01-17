@@ -414,13 +414,13 @@ def test_strategy_choice_gpu_str(strategy, strategy_class, cuda_count_2):
 
 
 @pytest.mark.parametrize("strategy_class", [DDPSpawnStrategy, DDPStrategy])
-def test_strategy_choice_gpu_instance(strategy_class, cuda_count_2):
+def test_strategy_choice_gpu_instance(strategy_class, cuda_count_2, mps_count_0):
     trainer = Trainer(strategy=strategy_class(), accelerator="gpu", devices=2)
     assert isinstance(trainer.strategy, strategy_class)
 
 
 @pytest.mark.parametrize("strategy_class", [DDPSpawnStrategy, DDPStrategy])
-def test_device_type_when_strategy_instance_gpu_passed(strategy_class, cuda_count_2):
+def test_device_type_when_strategy_instance_gpu_passed(strategy_class, cuda_count_2, mps_count_0):
     trainer = Trainer(strategy=strategy_class(), accelerator="gpu", devices=2)
     assert isinstance(trainer.strategy, strategy_class)
     assert isinstance(trainer.accelerator, CUDAAccelerator)

@@ -49,7 +49,7 @@ def main():
 
     state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
     fabric.load("lightning_logs/sharded_2", state)
-    print("after", model.layer.weight.data)
+    print("after", model.layer.weight)
 
 
 if __name__ == "__main__":

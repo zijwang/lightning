@@ -268,12 +268,10 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
         torch.distributed.broadcast_object_list(obj, src, group=_group.WORLD)
         return obj[0]
 
-    def save_checkpoint(
-        self, checkpoint: Dict[str, Any], filepath: _PATH, storage_options: Optional[Any] = None
-    ) -> None:
-        from torch.distributed._shard.checkpoint import FileSystemWriter, save_state_dict, load_state_dict
-
-
+    # def save_checkpoint(
+    #     self, checkpoint: Dict[str, Any], filepath: _PATH, storage_options: Optional[Any] = None
+    # ) -> None:
+    #     from torch.distributed._shard.checkpoint import FileSystemWriter, save_state_dict, load_state_dict
 
     def get_module_state_dict(self, module: Module) -> Dict[str, Union[Any, Tensor]]:
         from torch.distributed.fsdp import StateDictType, FullyShardedDataParallel

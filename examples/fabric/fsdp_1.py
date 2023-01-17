@@ -11,7 +11,7 @@ def _custom_auto_wrap_policy(module, recurse, unwrapped_params: int, min_num_par
 
 def main():
     strategy = FSDPStrategy(auto_wrap_policy=_custom_auto_wrap_policy)
-    fabric = Fabric(accelerator="cuda", devices=2, strategy="ddp")
+    fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
     fabric.launch()
 
     model = torch.nn.Linear(10, 10)  # total params: 10 * 10 = 100
@@ -20,13 +20,13 @@ def main():
     optimizer = Adam(wrapped_model.parameters())
     optimizer = fabric.setup_optimizers(optimizer)
 
-    output = model(torch.rand(5, 10, device=fabric.device))
+    output = wrapped_model(torch.rand(5, 10, device=fabric.device))
     loss = output.sum()
     fabric.backward(loss)
     optimizer.step()
     optimizer.zero_grad()
 
-    state = {"model": model, "optimizer": optimizer, "loss": loss.item()}
+    state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
     fabric.save("lightning_logs/sharded", state)
 
 

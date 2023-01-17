@@ -24,6 +24,8 @@ def main():
     fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
     fabric.launch()
 
+    checkpoint_path = "lightning_logs/sharded_2.ckpt"
+
     # with fabric.sharded_model():
     model = BigModel()  # total params: 10 * 10 = 100
     wrapped_model = fabric.setup_module(model)
@@ -38,7 +40,7 @@ def main():
     optimizer.zero_grad()
 
     state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
-    fabric.save(state, "lightning_logs/sharded_2")
+    fabric.save(state, checkpoint_path)
 
     # Loading
     model = BigModel()
@@ -48,7 +50,7 @@ def main():
     optimizer = fabric.setup_optimizers(optimizer)
 
     state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
-    fabric.load("lightning_logs/sharded_2", state)
+    fabric.load(checkpoint_path, state)
     # print("after", model.layer.weight)
 
 

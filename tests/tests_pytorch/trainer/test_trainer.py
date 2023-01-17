@@ -2136,7 +2136,8 @@ def test_trainer_calls_logger_finalize_on_exception(tmpdir):
     logger.finalize.assert_called_once_with("failed")
 
 
-@RunIf(min_torch="2.0.0")
+# TODO: replace with 2.0 when it is released
+@RunIf(min_torch="1.14.0.dev20221202")
 def test_trainer_compiled_model():
     model = BoringModel()
 

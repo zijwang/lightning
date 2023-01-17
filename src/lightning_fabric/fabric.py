@@ -530,7 +530,6 @@ class Fabric:
                     with FullyShardedDataParallel.state_dict_type(obj, StateDictType.LOCAL_STATE_DICT):
                         state_dict = self.strategy.get_module_state_dict(module=obj)
 
-
                     print(state_dict)
                     # TODO: check that .metadata file not already exists
                     writer = FileSystemWriter(destination / name)

@@ -14,7 +14,7 @@ def main():
     fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
     fabric.launch()
 
-    model = torch.nn.Linear(10, 10, bias=False)  # total params: 10 * 10 = 100
+    model = torch.nn.Linear(10, 10)  # total params: 10 * 10 = 100
     wrapped_model = fabric.setup_module(model)
 
     optimizer = Adam(wrapped_model.parameters())

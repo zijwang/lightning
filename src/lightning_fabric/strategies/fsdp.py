@@ -282,8 +282,8 @@ class FSDPStrategy(ParallelStrategy, _Sharded):
     def get_optimizer_state(self, optimizer: Optimizer) -> Dict[str, Tensor]:
         raise NotImplementedError()
 
-    def load_checkpoint(self, checkpoint_path: _PATH) -> Dict[str, Any]:
-        pass
+    # def load_checkpoint(self, checkpoint_path: _PATH) -> Dict[str, Any]:
+    #     pass
 
     def load_module_state_dict(self, module: Module, checkpoint: Mapping[str, Any]) -> None:
         pass

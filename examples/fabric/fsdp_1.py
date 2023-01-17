@@ -42,14 +42,14 @@ def main():
 
     # Loading
     model = BigModel()
-    print("before", model.layer.weight.data[0])
+    print("before", model.layer.weight.data)
     wrapped_model = fabric.setup_module(model)
     optimizer = Adam(wrapped_model.parameters())
     optimizer = fabric.setup_optimizers(optimizer)
 
     state = {"model": wrapped_model, "optimizer": optimizer, "loss": loss.item()}
     fabric.load("lightning_logs/sharded_2", state)
-    print("after", model.layer.weight.data[0])
+    print("after", model.layer.weight.data)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ def _custom_auto_wrap_policy(module, recurse, unwrapped_params: int, min_num_par
 
 def main():
     strategy = FSDPStrategy(auto_wrap_policy=_custom_auto_wrap_policy)
-    fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
+    fabric = Fabric(accelerator="cuda", devices=2, strategy="ddp")
     fabric.launch()
 
     model = torch.nn.Linear(10, 10)  # total params: 10 * 10 = 100

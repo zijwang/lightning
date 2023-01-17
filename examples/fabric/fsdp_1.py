@@ -25,8 +25,8 @@ def main():
     fabric = Fabric(accelerator="cuda", devices=2, strategy=strategy)
     fabric.launch()
 
-    with fabric.sharded_model():
-        model = BigModel()  # total params: 10 * 10 = 100
+    # with fabric.sharded_model():
+    model = BigModel()  # total params: 10 * 10 = 100
     wrapped_model = fabric.setup_module(model)
 
     optimizer = Adam(wrapped_model.parameters())

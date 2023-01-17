@@ -65,6 +65,7 @@ def test_tpu_spawn_debug_strategy_registry(xla_available):
     assert isinstance(trainer.strategy, TPUSpawnStrategy)
 
 
+@RunIf(min_torch="1.12")
 def test_fsdp_strategy_registry(cuda_count_1):
     strategy = "fsdp_native"
     assert strategy in StrategyRegistry

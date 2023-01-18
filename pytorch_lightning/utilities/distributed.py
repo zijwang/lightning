@@ -15,7 +15,7 @@
 import logging
 import os
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
+import datetime
 import torch
 from torch.nn.parallel.distributed import DistributedDataParallel
 
@@ -351,8 +351,9 @@ def init_dist_connection(
     world_size = world_size if world_size is not None else cluster_environment.world_size()
     os.environ["MASTER_ADDR"] = cluster_environment.main_address
     os.environ["MASTER_PORT"] = str(cluster_environment.main_port)
-    log.info(f"Initializing distributed: GLOBAL_RANK: {global_rank}, MEMBER: {global_rank + 1}/{world_size}")
-    torch.distributed.init_process_group(torch_distributed_backend, rank=global_rank, world_size=world_size, **kwargs)
+    timeout = datetime.timedelta(seconds=5000)
+    log.info(f"Initializing distributed: GLOBAL_RANK: {global_rank}, MEMBER: {global_rank + 1}/{world_size} timeout: {timeout}")
+    torch.distributed.init_process_group(torch_distributed_backend, timeout=timeout, rank=global_rank, world_size=world_size, **kwargs)
 
     # on rank=0 let everyone know training is starting
     new_rank_zero_info(

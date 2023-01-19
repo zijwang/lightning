@@ -74,7 +74,7 @@ class LightningDeepSpeedModule(_LightningModuleWrapperBase):
         self.precision = precision
 
     def forward(self, *inputs, **kwargs):
-        if self.precision == 16:
+        if self.precision in (16, "bf16"):
             inputs = self._move_float_tensors_to_half(inputs)
 
         return super().forward(*inputs, **kwargs)
@@ -83,8 +83,15 @@ class LightningDeepSpeedModule(_LightningModuleWrapperBase):
     def batch_to(data):
         return data.half()
 
+    @staticmethod
+    def batch_to_bfloat16(data):
+        return data.bfloat16()
+
     def _move_float_tensors_to_half(self, batch: Any):
-        batch = apply_to_collection(batch, (torch.FloatTensor, torch.cuda.FloatTensor), function=self.batch_to)
+        if self.precision == 16:
+            batch = apply_to_collection(batch, (torch.FloatTensor, torch.cuda.FloatTensor), function=self.batch_to)
+        elif self.precision == "bf16":
+            batch = apply_to_collection(batch, (torch.FloatTensor, torch.cuda.FloatTensor), function=self.batch_to_bfloat16)
         return batch
 
 
@@ -514,13 +521,14 @@ class DeepSpeedStrategy(DDPStrategy):
     def model_sharded_context(self) -> Generator[None, None, None]:
         if self.zero_stage_3:
             assert self._config_initialized
-            dtype = (
-                torch.float16
-                if self.precision_plugin.precision in (PrecisionType.HALF, PrecisionType.MIXED)
-                else torch.float32
-            )
+            if self.precision_plugin.precision in (PrecisionType.HALF, PrecisionType.MIXED):
+                dtype = torch.float16
+            elif self.precision_plugin.precision == PrecisionType.BFLOAT:
+                dtype = torch.bfloat16
+            else:
+                dtype = torch.float32
             model_parallel_context = deepspeed.zero.Init(
-                remote_device=self.remote_device, pin_memory=True, config_dict_or_path=self.config, dtype=dtype
+                remote_device=self.remote_device, pin_memory=True, config=self.config, dtype=dtype
             )
         else:
             model_parallel_context = super().model_sharded_context()
@@ -669,6 +677,11 @@ class DeepSpeedStrategy(DDPStrategy):
             elif "amp" not in self.config and self.precision_plugin.amp_type == AMPType.APEX:
                 rank_zero_info("Enabling DeepSpeed APEX Implementation.")
                 self.config["amp"] = {"enabled": True, "opt_level": self.precision_plugin.amp_level}
+        elif self.precision_plugin.precision == PrecisionType.BFLOAT:
+            if "bf16" not in self.config:
+                # BF16 is a DeepSpeed standalone AMP implementation
+                rank_zero_info("Enabling DeepSpeed BF16.")
+                self.config["bfloat16"] = {"enabled": True}
 
     def _create_default_config(
         self,

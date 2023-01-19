@@ -20,7 +20,7 @@ import platform
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Tuple, Union
-
+import datetime
 import torch
 from torch.nn import Module
 from torch.optim import Optimizer
@@ -368,13 +368,14 @@ class DeepSpeedStrategy(DDPStrategy):
         if platform.system() != "Windows":
             # do not set env variables on windows, allow deepspeed to control setup
             self._set_node_environment_variables()
+            timeout = datetime.timedelta(seconds=5000)
             log.info(
                 "initializing deepspeed distributed: "
                 f"GLOBAL_RANK: {self.global_rank}, "
-                f"MEMBER: {self.global_rank + 1}/{self.world_size}"
+                f"MEMBER: {self.global_rank + 1}/{self.world_size}  timeout: {timeout}"
             )
         self._process_group_backend = self._get_process_group_backend()
-        deepspeed.init_distributed(self._process_group_backend, distributed_port=self.cluster_environment.main_port)
+        deepspeed.init_distributed(self._process_group_backend, distributed_port=self.cluster_environment.main_port, timeout=timeout)
 
     def _get_process_group_backend(self):
         return (

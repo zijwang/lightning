@@ -375,7 +375,7 @@ class DeepSpeedStrategy(DDPStrategy):
         if platform.system() != "Windows":
             # do not set env variables on windows, allow deepspeed to control setup
             self._set_node_environment_variables()
-            timeout = datetime.timedelta(seconds=5000)
+            timeout = datetime.timedelta(seconds=4000)
             log.info(
                 "initializing deepspeed distributed: "
                 f"GLOBAL_RANK: {self.global_rank}, "
